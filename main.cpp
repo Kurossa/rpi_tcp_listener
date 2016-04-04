@@ -32,6 +32,9 @@ int main(int argc, char** argv) {
         exit(1);
     }
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+    int true_val = 1;
+    setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&true_val,sizeof(int));
     if (sockfd < 0)
        error("ERROR opening socket");
     bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -42,17 +45,29 @@ int main(int argc, char** argv) {
     if (bind(sockfd, (struct sockaddr *) &serv_addr,
              sizeof(serv_addr)) < 0)
              error("ERROR on binding");
-    listen(sockfd,5);
-    clilen = sizeof(cli_addr);
-    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0)
-         error("ERROR on accept");
-    bzero(buffer,256);
-    n = read(newsockfd,buffer,255);
-    if (n < 0) error("ERROR reading from socket");
-    printf("Here is the message: %s\n",buffer);
-    n = write(newsockfd,"I got your message",18);
-    if (n < 0) error("ERROR writing to socket");
+
+    int nn = 0;
+    for (nn = 0; nn < 5; ++nn) {
+		listen(sockfd,1);
+		clilen = sizeof(cli_addr);
+		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+		if (newsockfd < 0)
+			 error("ERROR on accept");
+
+		bzero(buffer,256);
+		n = read(newsockfd,buffer,255);
+		if (n < 0) error("ERROR reading from socket");
+		printf("Here is the message: %s\n",buffer);
+		n = write(newsockfd,"I got your message",18);
+		if (n < 0) error("ERROR writing to socket");
+    }
+
+    shutdown(newsockfd, 2);
+    shutdown(sockfd, 2);
+
+    close(newsockfd);
+    close(sockfd);
+
     return 0;
 }
 
