@@ -8,7 +8,10 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include utilities/subdir.mk
+-include app_zip/subdir.mk
 -include app_tcp_connection/subdir.mk
+-include app_config_parser/subdir.mk
 -include subdir.mk
 -include objects.mk
 
