@@ -13,8 +13,10 @@ enum eConfigManager {
     CONFIG_MANAGER_NOK
 };
 
-struct sPortConfig {
-
+struct sDeviceConfig {
+    string ipString;
+    int port;
+    vector<string> sounds;
 };
 
 typedef enum eDeviceType {
@@ -27,24 +29,14 @@ public:
     ~cConfigManager();
 
     eConfigManager init();
+    eConfigManager get_ipStr(string descr, string& ipString);
+    eConfigManager get_port(string descr, int& port);
+    eConfigManager get_sounds(string descr, vector<string>& sounds);
 
-    eConfigManager get_baudrateStr(string descr, string& brSpeed);
-    eConfigManager get_baudrate(string descr, speed_t& brSpeed);
-    eConfigManager get_data(string descr, sPortConfig& conf);
-    eConfigManager get_parityFlags(string descr, sPortConfig& portCfg);
-    eConfigManager get_stopFlags(string descr, sPortConfig& portCfg);
-    eConfigManager get_flowctrFlags(string descr, sPortConfig& portCfg);
-    eConfigManager get_path(string descr, string& path);
-    eConfigManager get_targetAddress(string descr, int& devAddres);
-    eConfigManager get_deviceType(string descr, eDeviceType_t& devType);
-
-    //list<cDevice*>* get_deviceList() { return &deviceList_m; }
-
-    sPortConfig niuBusCfg_m;
-    string niuBusAddr_m;
+    list<sDeviceConfig>* get_devicesConfigList() { return &deviceConfigList_m; }
 
 private:
-  //  list<cDevice*> deviceList_m;
+    list<sDeviceConfig> deviceConfigList_m;
 
 };
 

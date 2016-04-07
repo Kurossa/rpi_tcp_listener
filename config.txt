@@ -1,18 +1,6 @@
-serial_description { path: /dev/ttyS0, baudrate: 115200}
+# Configure IP
+ip_config { ip: 192.168.0.101, port: 6969}
 
-device_description {device_type:M_BUS,data:CS8,
-parity:NONE,address:7,
-baudrate:115200}
- 
-# data|partity|stop|flowcontrol
-# default configuration is 8|NONE|1|NONE
-# data: CS5, CS6, CS7, or CS8
-# parity
-#   INPCK  Enable input parity checking
-#   PARENB Enable parity generation on output and parity checking for input.
-#   PARODD If set, then parity for input and output is odd; otherwise even parity is used.
-# CSTOPB - Set two stop bits, rather than one
-# flowcontrol: 
-#   IXON   Enable XON/XOFF flow control on output
-#   IXOFF  Enable XON/XOFF flow control on input
-#   CRTSCTS  Enable RTS/CTS (hardware) flow control.
+# Configure sound files
+#NOTE: no spaces allowed in file name!
+sounds_config {sound:file1.mp3|file2.mp3}
