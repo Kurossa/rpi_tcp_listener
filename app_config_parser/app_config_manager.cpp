@@ -1,6 +1,6 @@
-#include "app_config_manager.hpp"
+#include <app_config_manager.hpp>
 #include <sstream>
-#include "../utilities/app_logger.hpp"
+#include <app_logger.hpp>
 
 string removeSpaces(string input) {
     string output;
@@ -55,7 +55,7 @@ eConfigManager cConfigManager::init() {
     }
 
     if (deviceConfigList_m.empty()) {
-        logPrintf(ERROR_LOG, "No devices configured.\n");
+        logPrintf(ERROR_LOG, "Config file - No devices configured.\n");
     }
 
     return status;

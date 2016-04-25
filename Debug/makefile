@@ -10,8 +10,12 @@ RM := rm -rf
 -include sources.mk
 -include utilities/subdir.mk
 -include app_zip/subdir.mk
+-include app_time/subdir.mk
 -include app_tcp_connection/subdir.mk
+-include app_msg_parser/subdir.mk
+-include app_mp3/subdir.mk
 -include app_config_parser/subdir.mk
+-include app_communication/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -47,7 +51,7 @@ all: rpi_tcp_listener
 rpi_tcp_listener: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	arm-linux-gnueabihf-g++  -o "rpi_tcp_listener" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-linux-gnueabihf-g++ -lpthread -o "rpi_tcp_listener" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -2,7 +2,7 @@
  * app_logger.hpp
  *
  *  Created on: Feb 2, 2016
- *      Author: root
+ *      Author: mariusz
  */
 
 #ifndef UTILITIES_APP_LOGGER_HPP_
@@ -28,10 +28,11 @@ typedef enum elogLevel {
     SCREEN_LOG
 } elogLevel_t;
 
-extern FILE *pLogFile_g; /* Log fle handler */
-
+extern FILE *pLogFile_g; /* Log file handler */
 int logInit();
 void logPrintf(int level, const char* format, ...);
 void logClose();
+void logSetVerboseMode(bool value);
+void logSetLogToFile(bool value);
 
 #endif /* UTILITIES_APP_LOGGER_HPP_ */

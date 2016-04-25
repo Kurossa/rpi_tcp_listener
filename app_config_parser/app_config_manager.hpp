@@ -1,7 +1,7 @@
 #ifndef SOURCES_APP_CONFIG_MANAGER_HPP
 #define SOURCES_APP_CONFIG_MANAGER_HPP
 
-#include "app_config_parser.hpp"
+#include <app_config_parser.hpp>
 #include <termios.h>
 #include <map>
 #include <list>
@@ -29,13 +29,13 @@ public:
     ~cConfigManager();
 
     eConfigManager init();
-    eConfigManager get_ipStr(string descr, string& ipString);
-    eConfigManager get_port(string descr, int& port);
-    eConfigManager get_sounds(string descr, vector<string>& sounds);
 
     list<sDeviceConfig>* get_devicesConfigList() { return &deviceConfigList_m; }
 
 private:
+    eConfigManager get_ipStr(string descr, string& ipString);
+    eConfigManager get_port(string descr, int& port);
+    eConfigManager get_sounds(string descr, vector<string>& sounds);
     list<sDeviceConfig> deviceConfigList_m;
 
 };

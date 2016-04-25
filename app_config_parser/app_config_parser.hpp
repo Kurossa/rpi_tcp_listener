@@ -24,6 +24,7 @@ class cConfigParser
     const char* fileName_m;
 public:
     cConfigParser(const char* fileName);
+protected:
     eParserStatus getConfig(const char* descr, vector<string>& destVec);
     eParserStatus getAttrVal(string& output, string attrLst, string attr, int optional = 0);
     eParserStatus getAttrNum(int& attrNum, string attrVal);

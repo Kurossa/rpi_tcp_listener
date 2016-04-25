@@ -1,8 +1,9 @@
-#include "app_file_handler.hpp"
+#include <app_file_handler.hpp>
 #include <time.h>
 #include <termios.h>
 
-cFileHandler::cFileHandler() : fd_m(0) {}
+cFileHandler::cFileHandler() : fd_m(0), pathname_m(NULL) {
+}
 
 eFileStatus_t cFileHandler::open_fd(const char *pathname, int flags, mode_t mode) {
     eFileStatus_t status = FILE_STATUS_GENERAL_FAIL;
@@ -67,7 +68,7 @@ eFileStatus_t cFileHandler::write_fd(uint8_t* data, uint16_t size, struct timeva
             perror(" cFileHandler::write_fd: select() error");
             status = FILE_STATUS_SELECT_FAILED;
         } else if (retval == 0) {
-           // printf("write_fd: file %s,  timeout expired, data not written to fd\n", pathname_m);
+            // printf("write_fd: file %s,  timeout expired, data not written to fd\n", pathname_m);
             status = FILE_STATUS_SELECT_TIMEOUT;
         } else {
             if (FD_ISSET(fd_m, &rfds)) {

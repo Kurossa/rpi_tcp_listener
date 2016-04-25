@@ -1,5 +1,5 @@
-#include "app_config_parser.hpp"
-#include "../utilities/app_logger.hpp"
+#include <app_config_parser.hpp>
+#include <app_logger.hpp>
 
 cConfigParser::cConfigParser(const char* fileName) {
     fileName_m = fileName;
