@@ -29,6 +29,7 @@ public:
     }
     ~tcpConnection(void) {
     }
+    void changeIp(const char* ip, const char* mask);
     tcpConStatus_t connect(void);
     tcpConStatus_t receive(char* rcv_buffer, int rcv_buffer_len, int& received);
     tcpConStatus_t send(const char* send_buffer, int send_buffer_len, int& sent);

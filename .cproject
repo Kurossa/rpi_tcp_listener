@@ -29,6 +29,8 @@
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.190145491" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../app_mp3/"/>
+									<listOptionValue builtIn="false" value="../"/>
+									<listOptionValue builtIn="false" value="../linux/"/>
 									<listOptionValue builtIn="false" value="../app_time/"/>
 									<listOptionValue builtIn="false" value="../app_communication/"/>
 									<listOptionValue builtIn="false" value="../app_msg_parser/"/>
@@ -47,6 +49,8 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.687268464" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../app_mp3/"/>
+									<listOptionValue builtIn="false" value="../"/>
+									<listOptionValue builtIn="false" value="../linux/"/>
 									<listOptionValue builtIn="false" value="../app_time/"/>
 									<listOptionValue builtIn="false" value="../app_communication/"/>
 									<listOptionValue builtIn="false" value="../app_msg_parser/"/>
@@ -58,8 +62,8 @@
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1413676775" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1146782672" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1833566327" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
-								<option id="gnu.cpp.link.option.flags.1155862546" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-lpthread" valueType="string"/>
+							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1833566327" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker">
+								<option id="gnu.cpp.link.option.flags.1155862546" name="Linker flags" superClass="gnu.cpp.link.option.flags" value=" -lao -lmpg123 -lpthread" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.827415835" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

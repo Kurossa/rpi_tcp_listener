@@ -1,0 +1,13 @@
+#!/bin/bash
+
+while true
+do
+	if	( pgrep -l rpi_tcp_listene )
+	then
+		:
+	else
+		/root/rpi_tcp_listener -v
+	fi
+	sleep 60
+done
+

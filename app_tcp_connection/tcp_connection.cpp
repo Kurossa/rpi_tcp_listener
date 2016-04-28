@@ -13,6 +13,33 @@
 #include <tcp_connection.hpp>
 #include <app_logger.hpp>
 
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <string.h>
+
+void tcpConnection::changeIp(const char* ip, const char* mask) {
+    struct ifreq ifr;
+    const char * name = "eth0";
+    int fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
+
+    strncpy(ifr.ifr_name, name, IFNAMSIZ);
+
+    ifr.ifr_addr.sa_family = AF_INET;
+    struct sockaddr_in* addr = (struct sockaddr_in*) &ifr.ifr_addr;
+    inet_pton(AF_INET, ip, &addr->sin_addr);
+    ioctl(fd, SIOCSIFADDR, &ifr);
+
+    inet_pton(AF_INET, mask, &addr->sin_addr);
+    //inet_pton(AF_INET, "255.255.0.0", ifr.ifr_addr.sa_data + 2);
+    ioctl(fd, SIOCSIFNETMASK, &ifr);
+
+    ioctl(fd, SIOCGIFFLAGS, &ifr);
+    strncpy(ifr.ifr_name, name, IFNAMSIZ);
+    ifr.ifr_flags |= (IFF_UP | IFF_RUNNING);
+
+    ioctl(fd, SIOCSIFFLAGS, &ifr);
+}
 tcpConStatus_t tcpConnection::connect(void) {
     tcpConStatus_t status = TCP_ERROR_GENERAL;
 

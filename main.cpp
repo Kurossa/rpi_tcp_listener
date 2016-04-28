@@ -17,7 +17,6 @@
 using namespace std;
 
 /* Globals */
-char ram[] = "/tmp/";
 int STOP_PROCCESS = 0;
 
 /* Main additional functions */
@@ -49,6 +48,7 @@ void print_usage(char* appName) {
     printf("\t-h Help\n");
 }
 
+/* Main loop */
 int main(int argc, char** argv) {
     printf("Starting %s.\n", argv[0]);
     int option = 0;
@@ -82,18 +82,8 @@ int main(int argc, char** argv) {
     init_signal_interrupt_handler();
     logPrintf(SCREEN_LOG, "Starting application.\n");
 
-    /* Initialize message queue(s) */
-    mqSend_t mqSend;
-    mqSend.init();
-    mqReply_t mqReply;
-    mqReply.init();
-
-    /* Initialize mp3 server thread */
-    cMp3Server mp3_server(&mqSend, &mqReply);
-    mp3_server.startThread();
-
-    /* Config Manager */
-    cConfigManager configManager("config.txt");
+    /* Configuration Manager */
+    cConfigManager configManager(config_file);
     if (CONFIG_MANAGER_OK == configManager.init()) {
 
         int errors_num = 0;
@@ -105,29 +95,39 @@ int main(int argc, char** argv) {
         //zip_uncompress("file2_orig.mp3", "file2.mp3");
 
         /* ZIP */
-        vector<string>::iterator it = devConfig.sounds.begin();
-        for (; it < devConfig.sounds.end(); ++it) {
-            char mp3Dest[256];
-            bzero(mp3Dest,256);
-            char mp3Source[(*it).length() + 1];
-            strcpy(mp3Source, (*it).c_str());
-            sprintf(mp3Dest,"%s%s",ram, mp3Source);
-            int status = zip_uncompress(mp3Source, mp3Dest);
+        vector<string>::iterator encSound_it = devConfig.sounds.begin();
+        vector<string>::iterator ramSound_it = devConfig.soundsInRam.begin();
+        for (; encSound_it < devConfig.sounds.end(); ++encSound_it, ++ramSound_it) {
+            int status = zip_uncompress((*encSound_it).c_str(), (*ramSound_it).c_str());
             if (ZIP_OK != status) {
                 ++errors_num;
             }
-            printf("unzip %s to %s, with status %d\n", mp3Source, mp3Dest, status);
+            printf("unzip %s to %s, with status %d\n", (*encSound_it).c_str(), (*ramSound_it).c_str(), status);
         }
         logPrintf(SCREEN_LOG, "Configuration done.\n");
 
+        /* Initialize message queue(s) */
+        mqSend_t mqSend;
+        mqSend.init();
+        mqReply_t mqReply;
+        mqReply.init();
+
+        /* Initialize mp3 server thread */
+        cMp3Server mp3_server(&mqSend, &mqReply, devConfig.soundsInRam);
+        mp3_server.startThread();
+        logPrintf(SCREEN_LOG, "Sound server start.\n");
+
         /* TCP Connection */
         tcpConnection tcp = tcpConnection(devConfig.port);
+        tcp.changeIp(devConfig.ipString.c_str(), devConfig.maskString.c_str());
+        usleep(500000);
         tcp.connect();
+        logPrintf(SCREEN_LOG, "TCP server start.\n");
 
         /* Communication */
         char cmdMsg[TCP_BUFFER_SIZE];
         char replyMsg[TCP_BUFFER_SIZE];
-        cCommunication communication(&mqSend, &mqReply);
+        cCommunication communication(&mqSend, &mqReply, &configManager);
 
         /* main loop */
         while (0 == STOP_PROCCESS && !errors_num) {
@@ -141,15 +141,15 @@ int main(int argc, char** argv) {
             printf("mqSend size = %d, mqReply size = %d\n", mqSend.size(), mqReply.size());
             printf("Received = %d, Sent = %d\n", recvdBytes, sentBytes);
         }
+        mp3_server.stopThread();
+        logPrintf(SCREEN_LOG, "Sound server stop.\n");
         tcp.disconnect();
+        logPrintf(SCREEN_LOG, "TCP server stop.\n");
     } else {
         logPrintf(ERROR_LOG, "Configuration Failed.\n");
     }
-
-    mp3_server.stopThread();
 
     logPrintf(SCREEN_LOG, "End application.\n");
     logClose();
     return 0;
 }
-

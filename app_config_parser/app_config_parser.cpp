@@ -5,8 +5,8 @@ cConfigParser::cConfigParser(const char* fileName) {
     fileName_m = fileName;
 }
 
-eParserStatus cConfigParser::getConfig(const char* descr, vector<string>& destVec) {
-    eParserStatus status = PARSER_CONF_ERROR;
+eParserStatus_t cConfigParser::getConfig(const char* descr, vector<string>& destVec) {
+    eParserStatus_t status = PARSER_CONF_ERROR;
     fstream fs;
     char line[MAX_CONFIG_LINE_SIZE];
 
@@ -43,8 +43,8 @@ eParserStatus cConfigParser::getConfig(const char* descr, vector<string>& destVe
     return status;
 }
 
-eParserStatus cConfigParser::getAttrVal(string& output, string attrLst, string attr, int optional/* = 0*/) {
-    eParserStatus status = PARSER_CONF_ERROR;
+eParserStatus_t cConfigParser::getAttrVal(string& output, string attrLst, string attr, int optional/* = 0*/) {
+    eParserStatus_t status = PARSER_CONF_ERROR;
     size_t pos = attrLst.find(attr);
     if (pos != string::npos) {
         size_t endPos = attrLst.find(",", pos);
@@ -62,8 +62,8 @@ eParserStatus cConfigParser::getAttrVal(string& output, string attrLst, string a
     }
     return status;
 }
-eParserStatus cConfigParser::getAttrNum(int& attrNum, string attrVal) {
-    eParserStatus status = PARSER_CONF_ERROR;
+eParserStatus_t cConfigParser::getAttrNum(int& attrNum, string attrVal) {
+    eParserStatus_t status = PARSER_CONF_ERROR;
 
     attrNum = 0;
     size_t pos = 0;
@@ -76,8 +76,8 @@ eParserStatus cConfigParser::getAttrNum(int& attrNum, string attrVal) {
     return status;
 }
 
-eParserStatus cConfigParser::getAttrByNum(string& attrByIndex, int attrIndex, string attrVal) {
-    eParserStatus status = PARSER_CONF_ERROR;
+eParserStatus_t cConfigParser::getAttrByNum(string& attrByIndex, int attrIndex, string attrVal) {
+    eParserStatus_t status = PARSER_CONF_ERROR;
 
     size_t pos = 0;
     for (int i = 0; i < attrIndex; ++i) {

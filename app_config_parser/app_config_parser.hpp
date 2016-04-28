@@ -11,24 +11,24 @@ using namespace std;
 
 #define MAX_CONFIG_LINE_SIZE (1024)
 
-enum eParserStatus {
+typedef enum eParserStatus {
     PARSER_CONF_OK = 0,
     PARSER_CONF_ERROR,
     PARSER_CONF_EMPTY,
     PARSER_CONF_NO_ATTR_BY_NUM,
     PARSER_CONF_NUM
-};
+}eParserStatus_t;
 
 class cConfigParser
 {
-    const char* fileName_m;
 public:
     cConfigParser(const char* fileName);
 protected:
-    eParserStatus getConfig(const char* descr, vector<string>& destVec);
-    eParserStatus getAttrVal(string& output, string attrLst, string attr, int optional = 0);
-    eParserStatus getAttrNum(int& attrNum, string attrVal);
-    eParserStatus getAttrByNum(string& attrByNum, int attrNum, string attrVal);
+    eParserStatus_t getConfig(const char* descr, vector<string>& destVec);
+    eParserStatus_t getAttrVal(string& output, string attrLst, string attr, int optional = 0);
+    eParserStatus_t getAttrNum(int& attrNum, string attrVal);
+    eParserStatus_t getAttrByNum(string& attrByNum, int attrNum, string attrVal);
+    const char* fileName_m;
 };
 
 

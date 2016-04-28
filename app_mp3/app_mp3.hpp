@@ -10,8 +10,14 @@
 
 #include <pthread.h>
 #include <string>
+#include <vector>
+#include <ao/ao.h>
+#include <app_consts.hpp>
+#include <mpg123.h>
 #include <app_thread_wrapper.hpp>
 #include <app_message_queue.hpp>
+
+using namespace std;
 
 typedef enum eMp3Action {
     MP3_PLAY = 0,
@@ -37,7 +43,7 @@ typedef enum eMp3Status {
     MP3_STATUS_NUM
 }eMp3Status_t;
 
-const char MPS_STATUS[MP3_STATUS_NUM][50] = { "AUDIO_IDLE",
+const char MP3_STATUS_STR[MP3_STATUS_NUM][50] = { "AUDIO_IDLE",
                                               "AUDIO_PLAY_ONCE",
                                               "AUDIO_PLAY_IN_LOOP",
                                               "AUDIO_FAILED" };
@@ -46,14 +52,14 @@ struct sMp3Message
 {
     uint16_t action;
     uint16_t parameter;
-    char* file;
+    uint16_t file_num;
     size_t file_size;
-
 };
 
 struct sMp3Reply
 {
-    eMp3Status_t status;
+    eMp3Status_t mp3Status;
+    eErrorCode_t errorCode;
 };
 
 typedef cMessageQueue<sMp3Message> mqSend_t;
@@ -61,24 +67,51 @@ typedef cMessageQueue<sMp3Reply> mqReply_t;
 
 class cMp3Server : public cPthreadWrapper{
 public:
-    cMp3Server(mqSend_t* mqSend, mqReply_t* mqReply) : mqSend_m(mqSend), mqReply_m(mqReply), threadRunning_m(0), status_m(MP3_STATUS_IDLE) {}
+    cMp3Server(mqSend_t* mqSend, mqReply_t* mqReply, vector<string> soundsInRam) :
+        mqSend_m(mqSend),
+        mqReply_m(mqReply),
+        threadRunning_m(0),
+        mp3Status_m(MP3_STATUS_IDLE),
+        errorCode_m(ERROR_CODE_OK),
+        soundsInRam_m(soundsInRam),
+        mh_m(0),
+        buffer_mpg_m(0),
+        buffer_mpg_size_m(0),
+        buffer_mpg_done_m(0),
+        err_m(0),
+        ao_driver_id_m(0),
+        ao_dev_m(0) {}
     ~cMp3Server() {}
 
     int startThread(void);
     int stopThread(void);
     void* action(void);
-    eMp3Status_t getStatus(void) { return status_m; }
 
 private:
+    void init(void);
+    void deinit(void);
     void handleMessage(sMp3Message& msg);
     void sendReplay(void);
     void playMp3(sMp3Message& msg);
+    void play(char * file);
     void setVolume(uint32_t volume);
 
     mqSend_t* mqSend_m;
     mqReply_t* mqReply_m;
     int threadRunning_m;
-    eMp3Status_t status_m;
+    eMp3Status_t mp3Status_m;
+    eErrorCode_t errorCode_m;
+
+    vector<string> soundsInRam_m;
+
+    /* mp3 */
+    mpg123_handle *mh_m;
+    unsigned char *buffer_mpg_m;
+    size_t buffer_mpg_size_m;
+    size_t buffer_mpg_done_m;
+    int err_m;
+    int ao_driver_id_m;
+    ao_device *ao_dev_m;
 };
 
 

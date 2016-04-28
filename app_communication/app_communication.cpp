@@ -8,75 +8,122 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <app_time.hpp>
 
 using namespace std;
 
 void cCommunication::handleCommand(char* cmdMsg, char* replyMsg) {
-//    printf("Received: %s", cmdMsg);
+    printf("Received: %s", cmdMsg);
     msgParser_m.parseMsg(cmdMsg, strlen(cmdMsg));
-//    for (int k = 0; k < msgParser_m.getMsgNodesNum(); ++k) {
-//        printf("%s\n", msgParser_m.getMsgNNodeStr(k));
-//    }
+    time_m.getTime(time_str_m);
+    command_m = msgParser_m.getMsgCommand();
 
-    char time_str[32];
-    cTime time;
-    time.getTime(time_str);
-
-    int command = msgParser_m.getMsgCommand();
-    switch (command) {
+    switch (command_m) {
     case TCP_SET_TIME:
-        time.setTime(msgParser_m.getMsgNNodeStr(1));
-        time.getTime(time_str);
-        sprintf(replyMsg,"COMMAND_%d_RECEIVED\n%s\nEND\n",command ,time_str);
+        handleSetTime(replyMsg);
         break;
     case TCP_PLAY:
-        mp3Cmd_m.action = MP3_PLAY;
-        mp3Cmd_m.parameter = MP3_PARAM_IN_LOOP;
-        mp3Cmd_m.file = msgParser_m.getMsgNNodeStr(1);
-        mqSend_m->push(mp3Cmd_m);
-        mqReply_m->wait(mp3Reply_m, -1);
-        sprintf(replyMsg,"COMMAND_%d_RECEIVED\n%s\n%s\nEND\n",command ,time_str, MPS_STATUS[mp3Reply_m.status]);
+        handlePlay(replyMsg);
         break;
     case TCP_STOP:
-        mp3Cmd_m.action = MP3_STOP;
-        mp3Cmd_m.parameter = MP3_PARAM_NUM;
-        mp3Cmd_m.file = NULL;
-        mqSend_m->push(mp3Cmd_m);
-        mqReply_m->wait(mp3Reply_m, -1);
-        sprintf(replyMsg,"COMMAND_%d_RECEIVED\n%s\n%s\nEND\n",command ,time_str, MPS_STATUS[mp3Reply_m.status]);
+        handleStop(replyMsg);
         break;
     case TCP_SET_CFG:
-        sprintf(replyMsg,"COMMAND_%d_RECEIVED\n%s\nEND\n",command ,time_str);
+        handleSetCfg(replyMsg);
         break;
     case TCP_GET_CFG:
-        sprintf(replyMsg,"COMMAND_%d_RECEIVED\n%s\nEND\n",command ,time_str);
+        handleGetCfg(replyMsg);
         break;
     case TCP_SET_VOLUME:
-        mp3Cmd_m.action = MP3_VOLUME;
-        mp3Cmd_m.parameter = atoi(msgParser_m.getMsgNNodeStr(1));
-        mp3Cmd_m.file = NULL;
-        mqSend_m->push(mp3Cmd_m);
-        mqReply_m->wait(mp3Reply_m, -1);
-        sprintf(replyMsg,"COMMAND_%d_RECEIVED\n%s\n%s\nEND\n",command ,time_str, MPS_STATUS[mp3Reply_m.status]);
+        handleVolume(replyMsg);
         break;
     case TCP_RESET:
-#warning //TODO: uncomment system reboot in final version
-        //system("reboot");
-        sprintf(replyMsg,"COMMAND_%d_RECEIVED\n%s\nEND\n",command ,time_str);
+        handleReset(replyMsg);
         break;
     case TCP_STATUS:
-        mp3Cmd_m.action = MP3_STATUS;
-        mp3Cmd_m.parameter = MP3_PARAM_NUM;
-        mp3Cmd_m.file = NULL;
-        mqSend_m->push(mp3Cmd_m);
-        mqReply_m->wait(mp3Reply_m, -1);
-        sprintf(replyMsg,"COMMAND_%d_RECEIVED\n%s\n%s\nEND\n",command ,time_str, MPS_STATUS[mp3Reply_m.status]);
+        handleStatus(replyMsg);
         break;
     case TCP_CMD_NUM:
     default:
-        sprintf(replyMsg,"UNKNOWN_COMMAND\n%s\nEND\n",time_str);
+        sprintf(replyMsg,"UNKNOWN_COMMAND\n%s\nEND\n",time_str_m);
         break;
     }
+}
+
+void cCommunication::handleSetTime(char* replyMsg) {
+    eErrorCode_t error_code = ERROR_CODE_SET_TIME_ERROR;
+    if (TIME_SET_OK == time_m.setTime(msgParser_m.getMsgNNodeStr(1))) {
+        error_code = ERROR_CODE_OK;
+    }
+    time_m.getTime(time_str_m);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, error_code);
+}
+
+void cCommunication::handlePlay(char* replyMsg) {
+    mp3Cmd_m.action = MP3_PLAY;
+    if(0==strcmp(msgParser_m.getMsgNNodeStr(2),"ONCE")){
+        mp3Cmd_m.parameter = MP3_PARAM_ONCE;
+    } else if (0==strcmp(msgParser_m.getMsgNNodeStr(2),"IN_LOOP")) {
+        mp3Cmd_m.parameter = MP3_PARAM_IN_LOOP;
+    } else {
+        mp3Cmd_m.parameter = MP3_PARAM_NUM;
+    }
+    mp3Cmd_m.file_num = atoi(msgParser_m.getMsgNNodeStr(1));
+    mqSend_m->push(mp3Cmd_m);
+    mqReply_m->wait(mp3Reply_m, -1);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, MP3_STATUS_STR[mp3Reply_m.mp3Status], mp3Reply_m.errorCode);
+}
+
+void cCommunication::handleStop(char* replyMsg) {
+    mp3Cmd_m.action = MP3_STOP;
+    mp3Cmd_m.parameter = MP3_PARAM_NUM;
+    mp3Cmd_m.file_num = 0;
+    mqSend_m->push(mp3Cmd_m);
+    mqReply_m->wait(mp3Reply_m, -1);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, MP3_STATUS_STR[mp3Reply_m.mp3Status], mp3Reply_m.errorCode);
+}
+
+void cCommunication::handleSetCfg(char* replyMsg) {
+    eErrorCode_t error_code = ERROR_CODE_OK;
+    FILE* dest = fopen(config_file, "wb");
+        fwrite(msgParser_m.getMsgNNodeStr(2), 1, strlen(msgParser_m.getMsgNNodeStr(2)), dest);
+    fclose(dest);
+    printf("Config: %s \n",msgParser_m.getMsgNNodeStr(2));
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, error_code);
+}
+
+void cCommunication::handleGetCfg(char* replyMsg) {
+    char configStream[MSG_NODE_SIZE];
+    size_t configSize = 0;
+    eErrorCode_t error_code = ERROR_CODE_GET_CFG_ERROR;
+    if (CONFIG_MANAGER_OK == conifgManager_m->getConfigFile(configStream, configSize)) {
+        error_code = ERROR_CODE_OK;
+    }
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%lu\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, configSize, configStream, error_code);
+}
+
+void cCommunication::handleVolume(char* replyMsg) {
+
+    mp3Cmd_m.action = MP3_VOLUME;
+    mp3Cmd_m.parameter = atoi(msgParser_m.getMsgNNodeStr(1));
+    mp3Cmd_m.file_num = 0;
+    mqSend_m->push(mp3Cmd_m);
+    mqReply_m->wait(mp3Reply_m, -1);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, MP3_STATUS_STR[mp3Reply_m.mp3Status], mp3Reply_m.errorCode);
+}
+
+void cCommunication::handleReset(char* replyMsg) {
+#warning //TODO: uncomment system reboot in final version
+    printf ("system reboot\n");
+    system("reboot");
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, ERROR_CODE_OK);
+}
+
+void cCommunication::handleStatus(char* replyMsg) {
+    mp3Cmd_m.action = MP3_STATUS;
+    mp3Cmd_m.parameter = MP3_PARAM_NUM;
+    mp3Cmd_m.file_num = 0;
+    mqSend_m->push(mp3Cmd_m);
+    mqReply_m->wait(mp3Reply_m, -1);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, MP3_STATUS_STR[mp3Reply_m.mp3Status], mp3Reply_m.errorCode);
 }
 
