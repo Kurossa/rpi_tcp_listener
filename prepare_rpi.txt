@@ -1,0 +1,54 @@
+#1 Install minibian
+dd bs=512 if=2016..minibian.img of=/dev/mmcblk0
+
+#2 resize partition to 1.5GB in gparted
+
+#3 add to config.txt on /boot add gpu_freq=250
+
+#4 connect to internet:
+	#4.1 apt-get update & apt-get upgrade
+	#4.2 apt-get install gcc g++ gdb
+	#4.3 install mpg123
+		apt-get install libao-dev
+		apt-get install libmpg123-dev
+#5 install aplication, copy config & startup script and encoded files.
+	#5.1 Startup script
+		sudo nano /etc/init.d/audioapp.start
+		sudo chmod 755 /etc/init.d/audioapp.start
+		sudo update-rc.d audioapp.start defaults
+
+#6 Ripping SD card to image
+
+	> fdisk -l /dev/mmcblk0
+
+	Disk /dev/mmcblk0: 16.1 GB, 16138633216 bytes
+	4 heads, 16 sectors/track, 492512 cylinders, total 31520768 sectors
+	Units = sectors of 1 * 512 = 512 bytes
+	Sector size (logical/physical): 512 bytes / 512 bytes
+	I/O size (minimum/optimal): 512 bytes / 512 bytes
+	Disk identifier: 0x00017b69
+
+	Device Boot      Start         End      Blocks   Id  System
+	/dev/mmcblk0p1    8192      122879       57344    c  W95 FAT32 (LBA)
+	/dev/mmcblk0p2  122880    26746879    13312000   83  Linux
+	The "Start" and "End" units are sectors, and notice the sector size is given, 512 bytes. For /dev/mmcblk0p2, 26746879 (the last sector) - 122880 (the first sector) = 26623999 / 2 (for 2 sectors per kB) / 1024 (kB per MB) / 1024 (MB per GB) = 12.69, which I grew the partition using gparted to 12 GB, so this looks correct (really I should be using 1000 and not 1024 as the divisor with storage, which works out to 13.31 GB, but I suspect gparted and some other tools also use 1024).
+
+	So the first thing you want to check is that your second partition is really the smaller size that you set it to. Next, just use those numbers with dd; for me it would be:
+
+	dd if=/dev/mmcblk0 of=rpi.img bs=512 count=26746880
+	I've got an extra sector there to avoid any kind of off by one misunderstanding of how dd works. There's a simple way to check if this worked:
+
+	> fdisk -l rpi.img
+
+	Disk rpi.img: 102 MB, 102400000 bytes
+	255 heads, 63 sectors/track, 12 cylinders, total 200000 sectors
+	Units = sectors of 1 * 512 = 512 bytes
+	Sector size (logical/physical): 512 bytes / 512 bytes
+	I/O size (minimum/optimal): 512 bytes / 512 bytes
+	Disk identifier: 0x00017b69
+
+	Device Boot      Start         End      Blocks   Id  System
+	rpi.img1          8192      122879       57344    c  W95 FAT32 (LBA)
+	rpi.img2        122880    26746879    13312000   83  Linux
+	Notice there is a bit of a discrepancy here: the "Start" and "End" sectors match the original partition table, but the total size in the stats up top is only 102 MB! This is because I actually used count=200000 as the param to dd because I did not really want to bother with a 12 GB copy (notice also "total 200000 sectors"). The reason the table at the bottom does not reflect this is because fdisk is getting its information from the partition data copied verbatim at the beginning of the image from the beginning of the SD card, which, as I mentioned in the second paragraph, is vital to maintain. If I had (properly) copied the rest, the numbers would be copacetic and the image would be viable.
+

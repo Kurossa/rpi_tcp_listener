@@ -1,4 +1,5 @@
 #include <app_file_handler.hpp>
+#include <app_logger.hpp>
 #include <time.h>
 #include <termios.h>
 
@@ -10,7 +11,7 @@ eFileStatus_t cFileHandler::open_fd(const char *pathname, int flags, mode_t mode
     pathname_m = pathname;
     fd_m = open(pathname, flags, mode);
     if (fd_m == -1) {
-        printf("cFileHandler: file %s", pathname);
+        logPrintf(ERROR_LOG, "cFileHandler: file %s", pathname);
         perror(NULL);
         status = FILE_STATUS_OPEN_ERROR;
     } else {
@@ -21,7 +22,7 @@ eFileStatus_t cFileHandler::open_fd(const char *pathname, int flags, mode_t mode
 
 cFileHandler::~cFileHandler() {
     if (close(fd_m) == -1) {
-        printf("fd close() error\n");
+        logPrintf(ERROR_LOG, "fd close() error\n");
     }
 }
 
@@ -43,9 +44,6 @@ eFileStatus_t cFileHandler::read_fd(uint8_t* data, uint16_t size, int& size_read
             if (size_read >= 0) {
                 status = FILE_STATUS_SUCCESS;
             } else {
-                //printf("cFileHandler::read_fd() file %s: ", pathname_m);
-                //perror(NULL);
-                // Add control if opened pty or not
                 status = FILE_STATUS_READ_FAILED;
             }
         } else {

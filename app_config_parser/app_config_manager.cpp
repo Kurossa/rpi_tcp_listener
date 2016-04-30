@@ -1,4 +1,5 @@
 #include <app_config_manager.hpp>
+#include <string.h>
 #include <sstream>
 #include <app_logger.hpp>
 #include <app_consts.hpp>
@@ -61,7 +62,7 @@ eConfigManager_t cConfigManager::init() {
 
 eConfigManager_t cConfigManager::getConfigFile(char* stream, size_t& size) {
     eConfigManager_t status = CONFIG_MANAGER_NOK;
-    stream[0] = '\0';
+    bzero(stream, size);
     size = 0;
     FILE* source = fopen(fileName_m, "r");
     if (source) {

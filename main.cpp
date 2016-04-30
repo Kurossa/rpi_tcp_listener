@@ -101,8 +101,9 @@ int main(int argc, char** argv) {
             int status = zip_uncompress((*encSound_it).c_str(), (*ramSound_it).c_str());
             if (ZIP_OK != status) {
                 ++errors_num;
+                logPrintf(ERROR_LOG, "Error decoding file: %s\n",(*encSound_it).c_str());
             }
-            printf("unzip %s to %s, with status %d\n", (*encSound_it).c_str(), (*ramSound_it).c_str(), status);
+            //printf("unzip %s to %s, with status %d\n", (*encSound_it).c_str(), (*ramSound_it).c_str(), status);
         }
         logPrintf(SCREEN_LOG, "Configuration done.\n");
 
@@ -138,8 +139,8 @@ int main(int argc, char** argv) {
             communication.handleCommand(cmdMsg, replyMsg);
             tcp.send(replyMsg,strlen(replyMsg),sentBytes);
 
-            printf("mqSend size = %d, mqReply size = %d\n", mqSend.size(), mqReply.size());
-            printf("Received = %d, Sent = %d\n", recvdBytes, sentBytes);
+            //printf("mqSend size = %d, mqReply size = %d\n", mqSend.size(), mqReply.size());
+            //printf("Received = %d, Sent = %d\n", recvdBytes, sentBytes);
         }
         mp3_server.stopThread();
         logPrintf(SCREEN_LOG, "Sound server stop.\n");

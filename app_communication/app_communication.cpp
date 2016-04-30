@@ -5,6 +5,8 @@
  *      Author: mariusz
  */
 #include <app_communication.hpp>
+#include <app_file_handler.hpp>
+#include <app_logger.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,10 +14,11 @@
 using namespace std;
 
 void cCommunication::handleCommand(char* cmdMsg, char* replyMsg) {
-    printf("Received: %s", cmdMsg);
+    //printf("Received: %s", cmdMsg);
     msgParser_m.parseMsg(cmdMsg, strlen(cmdMsg));
     time_m.getTime(time_str_m);
     command_m = msgParser_m.getMsgCommand();
+    logPrintf(SCREEN_LOG, "Received %d command\n", command_m);
 
     switch (command_m) {
     case TCP_SET_TIME:
@@ -87,13 +90,13 @@ void cCommunication::handleSetCfg(char* replyMsg) {
     FILE* dest = fopen(config_file, "wb");
         fwrite(msgParser_m.getMsgNNodeStr(2), 1, strlen(msgParser_m.getMsgNNodeStr(2)), dest);
     fclose(dest);
-    printf("Config: %s \n",msgParser_m.getMsgNNodeStr(2));
+    //printf("Config: %s \n",msgParser_m.getMsgNNodeStr(2));
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, error_code);
 }
 
 void cCommunication::handleGetCfg(char* replyMsg) {
     char configStream[MSG_NODE_SIZE];
-    size_t configSize = 0;
+    size_t configSize = MSG_NODE_SIZE;
     eErrorCode_t error_code = ERROR_CODE_GET_CFG_ERROR;
     if (CONFIG_MANAGER_OK == conifgManager_m->getConfigFile(configStream, configSize)) {
         error_code = ERROR_CODE_OK;
@@ -112,8 +115,7 @@ void cCommunication::handleVolume(char* replyMsg) {
 }
 
 void cCommunication::handleReset(char* replyMsg) {
-#warning //TODO: uncomment system reboot in final version
-    printf ("system reboot\n");
+    logPrintf(SCREEN_LOG, "system reboot!\n");
     system("reboot");
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, ERROR_CODE_OK);
 }

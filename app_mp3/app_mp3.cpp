@@ -54,7 +54,6 @@ void cMp3Server::handleMessage(sMp3Message& msg) {
     case MP3_STOP:
         errorCode_m = ERROR_CODE_OK;
         mp3Status_m = MP3_STATUS_IDLE;
-        printf("Stop playing.\n");
         sendReplay();
         break;
     case MP3_VOLUME:
@@ -117,14 +116,11 @@ void cMp3Server::playMp3(sMp3Message& msg) {
             format.byte_format = AO_FMT_NATIVE;
             format.matrix = 0;
             ao_dev_m = ao_open_live(ao_driver_id_m, &format, NULL);
-            printf("Playing: %s, in mode %d\n", soundsInRam_m.at(msg.file_num -1).c_str(), msg.parameter);
+            //printf("Playing: %s, in mode %d\n", soundsInRam_m.at(msg.file_num -1).c_str(), msg.parameter);
             int status = 0;
-            int n_samples = 0;
             while (threadRunning_m && (status = mpg123_read(mh_m, buffer_mpg_m, buffer_mpg_size_m, &buffer_mpg_done_m)) == MPG123_OK) {
                 /* MP3 DECODE CODE HERE */
                 ao_play(ao_dev_m, (char *) buffer_mpg_m, buffer_mpg_done_m);
-                ++n_samples;
-                printf("Sample %02d \n", n_samples);
                 /* MP3 DECODE CODE HERE */
                 if (MQ_MSG_PENDING == mqSend_m->poke(msg_poke)) {
                     switch (msg_poke.action) {
@@ -165,7 +161,6 @@ void cMp3Server::playMp3(sMp3Message& msg) {
 }
 
 void cMp3Server::setVolume(uint32_t volume) {
-    printf("Volume changed %d.\n", volume);
     errorCode_m = ERROR_CODE_WRONG_VOLUME;
     if (volume >= 0 && volume <=100) {
         errorCode_m = ERROR_CODE_OK;
@@ -183,7 +178,6 @@ mh_m = mpg123_new(NULL, &err_m);
 buffer_mpg_size_m = mpg123_outblock(mh_m);
 buffer_mpg_size_m = MP3_SAMPLE_SIZE;
 buffer_mpg_m = (unsigned char*) malloc(buffer_mpg_size_m * sizeof(unsigned char));
-printf("mpg123 buffer size = %d\n", (int)buffer_mpg_size_m);
 }
 
 void cMp3Server::play(char * file) {

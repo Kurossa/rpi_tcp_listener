@@ -30,7 +30,7 @@ void cMsgParser::parseMsg(char* msg, int msgLength) {
     /* Special parser for files */
     parseSetCfgMsg(msg, msgLength);
 
-    printf("Found %d node(s)\n", msgNodesNum_m);
+    //printf("Found %d node(s)\n", msgNodesNum_m);
 }
 
 void cMsgParser::parseSetCfgMsg(char* msg, int msgLength) {
@@ -89,7 +89,6 @@ eMsgCmd_t cMsgParser::getMsgCommand(void) {
     if (MSG_COMMAND_NODES[command] != msgNodesNum_m) {
         command = TCP_CMD_NUM;
     }
-    printf ("Command: %d found.\n",command);
     return command;
 }
 

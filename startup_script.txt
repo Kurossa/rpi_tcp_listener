@@ -1,7 +1,0 @@
-Create a file for your startup script and write your script in the file:
-$ sudo nano /etc/init.d/superscript
-Save and exit: Ctrl+X, Y, Enter
-Make the script executable:
-$ sudo chmod 755 /etc/init.d/superscript
-Register script to be run at startup:
-$ sudo update-rc.d superscript defaults

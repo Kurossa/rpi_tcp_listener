@@ -1,0 +1,13 @@
+#!/bin/bash
+
+while true
+do
+	if	( pgrep -l audio_app )
+	then
+		:
+	else
+		/root/audio_app -v
+	fi
+	sleep 60
+done
+
