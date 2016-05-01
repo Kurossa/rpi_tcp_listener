@@ -80,7 +80,8 @@ public:
         buffer_mpg_done_m(0),
         err_m(0),
         ao_driver_id_m(0),
-        ao_dev_m(0) {}
+        ao_dev_m(0),
+        volume_m(100) {}
     ~cMp3Server() {}
 
     int startThread(void);
@@ -93,7 +94,6 @@ private:
     void handleMessage(sMp3Message& msg);
     void sendReplay(void);
     void playMp3(sMp3Message& msg);
-    void play(char * file);
     void setVolume(uint32_t volume);
 
     mqSend_t* mqSend_m;
@@ -112,6 +112,8 @@ private:
     int err_m;
     int ao_driver_id_m;
     ao_device *ao_dev_m;
+
+    uint32_t volume_m;
 };
 
 

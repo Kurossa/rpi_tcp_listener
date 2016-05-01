@@ -9,13 +9,13 @@
 #include <app_mp3.hpp>
 #include <app_logger.hpp>
 
+#define MAX_INFINITE_LOOPS (100)
 #define MP3_SAMPLE_SIZE (16384)
 #define BITS (8)
 
 int cMp3Server::startThread(void) {
     int status = 0;
     threadRunning_m = 1;
-    init();
     status = pthread_create(&threadId_m, NULL, &doAction, this);
     return status;
 }
@@ -23,7 +23,6 @@ int cMp3Server::startThread(void) {
 int cMp3Server::stopThread(void) {
     int status = 0;
     threadRunning_m = 0;
-    deinit();
     status = pthread_join(threadId_m, NULL);
     return status;
 }
@@ -94,6 +93,7 @@ void cMp3Server::playMp3(sMp3Message& msg) {
     int channels, encoding;
     long rate;
 
+    init();
     errorCode_m = ERROR_CODE_NOK;
     if (msg.file_num > 0 && msg.file_num <= soundsInRam_m.size() && MPG123_OK == mpg123_open(mh_m, soundsInRam_m.at(msg.file_num -1).c_str())) {
         errorCode_m = ERROR_CODE_OK;
@@ -104,7 +104,10 @@ void cMp3Server::playMp3(sMp3Message& msg) {
         else if (MP3_PARAM_IN_LOOP == msg.parameter) {
             mp3Status_m = MP3_STATUS_PLAY_IN_LOOP;
         }
+        deinit();
+        uint32_t max_loops = 0;
         do {
+            init();
             // open the file and get the decoding format
             mpg123_open(mh_m, soundsInRam_m.at(msg.file_num -1).c_str());
             mpg123_getformat(mh_m, &rate, &channels, &encoding);
@@ -118,6 +121,7 @@ void cMp3Server::playMp3(sMp3Message& msg) {
             ao_dev_m = ao_open_live(ao_driver_id_m, &format, NULL);
             //printf("Playing: %s, in mode %d\n", soundsInRam_m.at(msg.file_num -1).c_str(), msg.parameter);
             int status = 0;
+            setVolume(volume_m);
             while (threadRunning_m && (status = mpg123_read(mh_m, buffer_mpg_m, buffer_mpg_size_m, &buffer_mpg_done_m)) == MPG123_OK) {
                 /* MP3 DECODE CODE HERE */
                 ao_play(ao_dev_m, (char *) buffer_mpg_m, buffer_mpg_done_m);
@@ -151,11 +155,14 @@ void cMp3Server::playMp3(sMp3Message& msg) {
                     sendReplay();
                 }
             }
-        } while (threadRunning_m && MP3_PARAM_IN_LOOP == msg.parameter && !new_message);
+            ++max_loops;
+            deinit();
+        } while (threadRunning_m && !new_message && max_loops < MAX_INFINITE_LOOPS && MP3_PARAM_IN_LOOP == msg.parameter);
     } else {
         errorCode_m = ERROR_CODE_NO_FILE_NUM;
         mp3Status_m = MP3_STATUS_IDLE;
         sendReplay();
+        deinit();
     }
     mp3Status_m = MP3_STATUS_IDLE;
 }
@@ -163,6 +170,7 @@ void cMp3Server::playMp3(sMp3Message& msg) {
 void cMp3Server::setVolume(uint32_t volume) {
     errorCode_m = ERROR_CODE_WRONG_VOLUME;
     if (volume >= 0 && volume <=100) {
+        volume_m = volume;
         errorCode_m = ERROR_CODE_OK;
         float vol = volume / 100.0;
         mpg123_volume(mh_m, vol);
@@ -170,45 +178,14 @@ void cMp3Server::setVolume(uint32_t volume) {
 }
 
 void cMp3Server::init(void) {
-//initializations
-ao_initialize();
-ao_driver_id_m = ao_default_driver_id();
-mpg123_init();
-mh_m = mpg123_new(NULL, &err_m);
-buffer_mpg_size_m = mpg123_outblock(mh_m);
-buffer_mpg_size_m = MP3_SAMPLE_SIZE;
-buffer_mpg_m = (unsigned char*) malloc(buffer_mpg_size_m * sizeof(unsigned char));
-}
-
-void cMp3Server::play(char * file) {
-ao_sample_format format;
-int channels, encoding;
-long rate;
-
-// open the file and get the decoding format
-mpg123_open(mh_m, file);
-mpg123_getformat(mh_m, &rate, &channels, &encoding);
-
-// set the output format and open the output device
-format.bits = mpg123_encsize(encoding) * BITS;
-format.rate = rate;
-format.channels = channels;
-format.byte_format = AO_FMT_NATIVE;
-format.matrix = 0;
-ao_dev_m = ao_open_live(ao_driver_id_m, &format, NULL);
-
-// decode and play
-int status = 0;
-//double base, really, rva_db, vol = 1;
-//vol = 1;
-while ((status = mpg123_read(mh_m, buffer_mpg_m, buffer_mpg_size_m, &buffer_mpg_done_m)) == MPG123_OK) {
-    ao_play(ao_dev_m, (char *) buffer_mpg_m, buffer_mpg_done_m);
-    }
-//    mpg123_volume(mh_m, vol);
-    //MPG123_EXPORT int mpg123_volume_change(mpg123_handle *mh, double change);
-
-//    mpg123_getvolume(mh_m, &base, &really, &rva_db);
-//    printf("next sample %d , status %d, base = %f, really = %f, rva_db = %f\n", n_samp, status, base, really, rva_db);
+    /* Initialization */
+    ao_initialize();
+    ao_driver_id_m = ao_default_driver_id();
+    mpg123_init();
+    mh_m = mpg123_new(NULL, &err_m);
+    buffer_mpg_size_m = mpg123_outblock(mh_m);
+    buffer_mpg_size_m = MP3_SAMPLE_SIZE;
+    buffer_mpg_m = (unsigned char*) malloc(buffer_mpg_size_m * sizeof(unsigned char));
 }
 
 void cMp3Server::deinit(void) {
@@ -219,4 +196,12 @@ void cMp3Server::deinit(void) {
     mpg123_delete(mh_m);
     mpg123_exit();
     ao_shutdown();
+    buffer_mpg_m = 0;
+    ao_dev_m = 0;
+    mh_m = 0;
+
+    buffer_mpg_size_m = 0;
+    buffer_mpg_done_m = 0;
+    err_m = 0;
+    ao_driver_id_m = 0;
 }

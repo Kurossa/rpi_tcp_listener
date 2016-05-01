@@ -17,8 +17,15 @@ dd bs=512 if=2016..minibian.img of=/dev/mmcblk0
 		sudo chmod 755 /etc/init.d/audioapp.start
 		sudo update-rc.d audioapp.start defaults
 
-#6 Ripping SD card to image
+7# Problem with network. Remove file where MAC address is written.
+The fix is to delete the info file with the command line 
+sudo mv /etc/udev/rules.d/70-persistent-net.rules /etc/udev/rules.d/70-persistent-net.rules.old 
 
+#6 Ripping SD card to image
+	For image < 2GB:
+	sudo dd if=/dev/mmcblk0 of=audio_app_01_05_2016.img bs=512 count=3200000
+
+	Informations:
 	> fdisk -l /dev/mmcblk0
 
 	Disk /dev/mmcblk0: 16.1 GB, 16138633216 bytes
