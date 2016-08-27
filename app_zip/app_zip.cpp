@@ -19,7 +19,7 @@ eZipStaus_t zip_uncompress(const char* source_name, const char* destination_name
         status = ZIP_SAME_SRC_DST;
     } else {
         // check if file exists
-        FILE* source = fopen(source_name, "r");
+        FILE* source = fopen(source_name, "rb");
         if (source) {
             FILE* dest = fopen(destination_name, "wb");
 
@@ -76,7 +76,7 @@ eZipStaus_t zip_compress(const char* source_name, const char* destination_name) 
         status = ZIP_SAME_SRC_DST;
         logPrintf(ERROR_LOG, "Compress failed: same source and destination.\n");
     } else {
-        FILE* source = fopen(source_name, "r");
+        FILE* source = fopen(source_name, "rb");
         if (source) {
             FILE* dest = fopen(destination_name, "wb");
 

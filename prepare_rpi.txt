@@ -17,11 +17,11 @@ dd bs=512 if=2016..minibian.img of=/dev/mmcblk0
 		sudo chmod 755 /etc/init.d/audioapp.start
 		sudo update-rc.d audioapp.start defaults
 
-7# Problem with network. Remove file where MAC address is written.
+#6 Problem with network. Remove file where MAC address is written.
 The fix is to delete the info file with the command line 
 sudo mv /etc/udev/rules.d/70-persistent-net.rules /etc/udev/rules.d/70-persistent-net.rules.old 
 
-#6 Ripping SD card to image
+#7 Ripping SD card to image
 	For image < 2GB:
 	sudo dd if=/dev/mmcblk0 of=audio_app_01_05_2016.img bs=512 count=3200000
 
@@ -59,3 +59,5 @@ sudo mv /etc/udev/rules.d/70-persistent-net.rules /etc/udev/rules.d/70-persisten
 	rpi.img2        122880    26746879    13312000   83  Linux
 	Notice there is a bit of a discrepancy here: the "Start" and "End" sectors match the original partition table, but the total size in the stats up top is only 102 MB! This is because I actually used count=200000 as the param to dd because I did not really want to bother with a 12 GB copy (notice also "total 200000 sectors"). The reason the table at the bottom does not reflect this is because fdisk is getting its information from the partition data copied verbatim at the beginning of the image from the beginning of the SD card, which, as I mentioned in the second paragraph, is vital to maintain. If I had (properly) copied the rest, the numbers would be copacetic and the image would be viable.
 
+#8 Create bootable audio app linux from .iso
+	sudo dd if=/audio_app_01_05_2016.img of=/dev/mmcblk0 bs=512
