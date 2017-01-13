@@ -13,9 +13,15 @@
 #define TCP_BUFFER_SIZE (1024)
 
 typedef enum tcpConStatus {
-    TCP_ERROR_GENERAL = 0,
+    TCP_NO_ERROR = 0,
+    TCP_ERROR_CREATE_FD,
+    TCP_ERROR_SET_IP,
+    TCP_ERROR_SET_MASK,
+    TCP_ERROR_SET_ROUTE,
+    TCP_ERROR_SET_FLAGS,
     TCP_ERROR_OPENING_PORT,
     TCP_ERROR_ON_BINDING,
+    TCP_ERROR_ON_LISTEN,
     TCP_ERROR_ACCEPT_SOCKET,
     TCP_ERROR_WRITE_TO_SOCKET,
     TCP_ERROR_READ_FROM_SOCKET,
@@ -29,7 +35,8 @@ public:
     }
     ~tcpConnection(void) {
     }
-    void changeIp(const char* ip, const char* mask);
+    tcpConStatus_t changeIp(const char* ip, const char* mask, const char* gateway);
+    tcpConStatus_t setRoute(int sockfd, const char *gateway_addr);
     tcpConStatus_t connect(void);
     tcpConStatus_t receive(char* rcv_buffer, int rcv_buffer_len, int& received);
     tcpConStatus_t send(const char* send_buffer, int send_buffer_len, int& sent);

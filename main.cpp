@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
 
         /* TCP Connection */
         tcpConnection tcp = tcpConnection(devConfig.port);
-        tcp.changeIp(devConfig.ipString.c_str(), devConfig.maskString.c_str());
+        tcp.changeIp(devConfig.ipString.c_str(), devConfig.maskString.c_str(), devConfig.gatewayString.c_str());
         usleep(500000);
         tcp.connect();
         logPrintf(SCREEN_LOG, "TCP server start.\n");
@@ -135,9 +135,10 @@ int main(int argc, char** argv) {
             int recvdBytes, sentBytes;
             sprintf(replyMsg,"UNKNOWN_COMMAND\nEND\n");
 
-            tcp.receive(cmdMsg, TCP_BUFFER_SIZE, recvdBytes);
-            communication.handleCommand(cmdMsg, replyMsg);
-            tcp.send(replyMsg,strlen(replyMsg),sentBytes);
+            if (TCP_NO_ERROR == tcp.receive(cmdMsg, TCP_BUFFER_SIZE, recvdBytes)) {
+                communication.handleCommand(cmdMsg, replyMsg);
+                tcp.send(replyMsg, strlen(replyMsg), sentBytes);
+            }
 
             //printf("mqSend size = %d, mqReply size = %d\n", mqSend.size(), mqReply.size());
             //printf("Received = %d, Sent = %d\n", recvdBytes, sentBytes);

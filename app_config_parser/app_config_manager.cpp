@@ -25,11 +25,16 @@ eConfigManager_t cConfigManager::init() {
 
             int cmStatus = CONFIG_MANAGER_OK;
             cmStatus |= get_ipStr(*it, devConfig.ipString);
+            cmStatus |= get_gatewayStr(*it, devConfig.gatewayString);
             cmStatus |= get_maskStr(*it, devConfig.maskString);
             cmStatus |= get_port(*it, devConfig.port);
 
             if (cmStatus == CONFIG_MANAGER_OK) {
-                logPrintf(SCREEN_LOG, "Ethernet configuration: ip address: %s:%d\n", devConfig.ipString.c_str(), devConfig.port);
+                logPrintf(SCREEN_LOG, "Ethernet configuration: ip address: %s:%d, mask: %s, gateway: %s\n"
+                        , devConfig.ipString.c_str()
+                        , devConfig.port
+                        , devConfig.maskString.c_str()
+                        , devConfig.gatewayString.c_str());
 
                 vector<string> soundsConfVect;
                 getConfig("sounds_config", soundsConfVect);
@@ -88,6 +93,16 @@ eConfigManager_t cConfigManager::get_maskStr(string descr, string& ipString) {
     string val;
     if (PARSER_CONF_OK == getAttrVal(val, descr, "mask")) {
         istringstream(val) >> skipws >> ipString;
+        status = CONFIG_MANAGER_OK;
+    }
+    return status;
+}
+
+eConfigManager_t cConfigManager::get_gatewayStr(string descr, string& gatewayString) {
+    eConfigManager_t status = CONFIG_MANAGER_NOK;
+    string val;
+    if (PARSER_CONF_OK == getAttrVal(val, descr, "gateway")) {
+        istringstream(val) >> skipws >> gatewayString;
         status = CONFIG_MANAGER_OK;
     }
     return status;

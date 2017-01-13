@@ -16,6 +16,7 @@ typedef enum eConfigManager {
 struct sDeviceConfig {
     string ipString;
     string maskString;
+    string gatewayString;
     int port;
     vector<string> sounds;
     vector<string> soundsInRam;
@@ -34,6 +35,7 @@ public:
 private:
     eConfigManager_t get_ipStr(string descr, string& ipString);
     eConfigManager_t get_maskStr(string descr, string& ipString);
+    eConfigManager_t get_gatewayStr(string descr, string& gatewayString);
     eConfigManager_t get_port(string descr, int& port);
     eConfigManager_t get_sounds(string descr, vector<string>& sounds, vector<string>& soundsInRam);
     list<sDeviceConfig> deviceConfigList_m;
