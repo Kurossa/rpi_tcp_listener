@@ -6,7 +6,7 @@ do
 	then
 		:
 	else
-		/root/audio_app -v
+		/root/audio_app
 	fi
 	sleep 60
 done

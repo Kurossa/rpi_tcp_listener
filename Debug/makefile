@@ -51,7 +51,7 @@ all: audio_app
 audio_app: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	arm-linux-gnueabihf-g++ -lao -lmpg123 -lpthread -o "audio_app" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-linux-gnueabihf-g++ -o "audio_app" $(OBJS) $(USER_OBJS) $(LIBS) -lpthread -lmpg123 -lao
 	@echo 'Finished building target: $@'
 	@echo ' '
 
