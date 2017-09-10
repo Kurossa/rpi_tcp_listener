@@ -4,15 +4,17 @@
  *  Created on: Mar 22, 2016
  *      Author: mkrzysie
  */
+
+#include <utilities/logger.h>
+#include <zip/zip.h>
+#include <mp3/mp3.h>
+#include <tcp_connection/tcp_connection.h>
+#include <communication/communication.h>
+#include <config_manager/config_manager.h>
 #include <signal.h>
 #include <getopt.h>
 #include <string.h>
-#include <app_logger.hpp>
-#include <app_zip.hpp>
-#include <app_mp3.hpp>
-#include <tcp_connection.hpp>
-#include <app_communication.hpp>
-#include <app_config_manager.hpp>
+
 
 using namespace std;
 
