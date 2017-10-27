@@ -55,7 +55,7 @@ Disk identifier: 0x0004bfaa
 Stick.img1   *         128     8015999     4007936    b  W95 FAT32
 ```
 
-So a block-size of 512 bytes and the start-block is 128. The <offset> is 512 * 128 = 65536. Now image file can be mounted:
+So the block-size is 512 bytes and the start-block is 128. The offset is 512 * 128 = 65536. Now image file can be mounted:
 
 ```
 $ sudo mount -o loop,offset=<offset> <image_name>.img <target_folder>
