@@ -12,5 +12,6 @@ add_library (mp3
 
 target_include_directories (mp3 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries (mp3 PRIVATE app_utilities app_config "${PTHREAD_LIB}" "${MPG123_LIB}" "${AO_LIB}")
+target_link_libraries (mp3 PRIVATE "${PTHREAD_LIB}" "${MPG123_LIB}" "${AO_LIB}"
+	PUBLIC app_utilities app_config)
 
