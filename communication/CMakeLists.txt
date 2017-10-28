@@ -1,7 +1,9 @@
 cmake_minimum_required (VERSION 3.5)
 project (communication)
 
-add_library (communication communication/communication.cpp)
+add_library (communication 
+	communication/communication.cpp
+	communication/communication.h)
 
 target_include_directories (communication PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
