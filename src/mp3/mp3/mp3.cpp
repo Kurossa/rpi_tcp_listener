@@ -171,7 +171,7 @@ void cMp3Server::playMp3(sMp3Message& msg) {
 
 void cMp3Server::setVolume(uint32_t volume) {
     errorCode_m = ERROR_CODE_WRONG_VOLUME;
-    if (volume >= 0 && volume <=100) {
+    if (volume <=100) {
         volume_m = volume;
         errorCode_m = ERROR_CODE_OK;
         float vol = volume / 100.0;

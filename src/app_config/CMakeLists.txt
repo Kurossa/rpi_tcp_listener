@@ -1,4 +1,3 @@
-cmake_minimum_required (VERSION 3.5)
 project (app_config)
 
 add_library (app_config INTERFACE)

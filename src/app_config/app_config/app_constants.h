@@ -1,5 +1,5 @@
 /*
- * error_codes.hpp
+ * app_constants.h
  *
  *  Created on: Apr 27, 2016
  *      Author: mariusz
