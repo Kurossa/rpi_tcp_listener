@@ -2,5 +2,9 @@ Build all using command line:
 $ cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../rpi_tcp_listener/toolchain_raspberry_pi.cmake ../src
 $ make
 
+Build all with Unit Tests command line:
+$ cmake -DTEST=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../rpi_tcp_listener/toolchain_raspberry_pi.cmake ../src
+$ make
+
 Create Eclipse project:
 $ cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../rpi_tcp_listener/toolchain_raspberry_pi.cmake -G"Eclipse CDT4 - Unix Makefiles" ../src

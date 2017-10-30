@@ -71,6 +71,8 @@ $ cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../toolchain_raspberry_p
 $ make
 ```
 
+To build with unit tests add flag -DTEST=ON
+
 # Run application on target
 Example:
 
