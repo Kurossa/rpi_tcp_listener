@@ -1,15 +1,7 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(rpi_tcp_listener_project VERSION 3.0 LANGUAGES CXX)
 
-# Option -DTEST=ON to enable teting
-option(TEST "Build all tests" OFF)
-
 add_definitions(-Wall -Wextra -Werror -pedantic -std=gnu++11)
-
-if (TEST)
-	enable_testing()
-	add_subdirectory(ext/gtest-1.7.0)
-endif()
 
 add_subdirectory(app_config)
 add_subdirectory(utilities)
@@ -21,3 +13,12 @@ add_subdirectory(config_manager)
 add_subdirectory(mp3)
 add_subdirectory(communication)
 add_subdirectory(rpi_tcp_listener_app)
+
+# Unit tests section
+# Option -DTEST=ON to enable testing
+option(TEST "Build all tests" OFF)
+
+if (TEST)
+	enable_testing()
+	add_subdirectory(ext/gtest-1.7.0)
+endif()
