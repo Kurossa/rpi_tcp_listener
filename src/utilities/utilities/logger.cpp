@@ -111,7 +111,7 @@ static int logChange() {
 }
 
 static void logRemoveLogs(void) {
-    unsigned char isFile =0x8;
+    unsigned char isFile = 0x8;
     std::set<std::string> logFileNames;
     DIR *dp;
     struct dirent *dirp;

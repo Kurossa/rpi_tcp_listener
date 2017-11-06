@@ -14,6 +14,8 @@ const char config_file[] = "/etc/audio_app.cfg";
 const char ram[] = "/tmp/";
 /* Location of encoded files */
 const char encoded[] = "/root/";
+/* Network interface; default: eth0 */
+const char network_interface[] = "eth0";
 
 typedef enum eErrorCode {
     ERROR_CODE_OK = 0,

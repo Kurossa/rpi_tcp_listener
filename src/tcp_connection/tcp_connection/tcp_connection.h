@@ -9,10 +9,14 @@
 #define APP_TCP_CONNECTION_TCP_CONNECTION_HPP_
 
 #include <netinet/in.h>
+#include <string>
 
-#define TCP_BUFFER_SIZE (1024)
+namespace tcp
+{
 
-typedef enum tcpConStatus {
+const int BUFFER_SIZE = 1024;
+
+typedef enum ConStatus {
     TCP_NO_ERROR = 0,
     TCP_ERROR_CREATE_FD,
     TCP_ERROR_SET_IP,
@@ -23,31 +27,32 @@ typedef enum tcpConStatus {
     TCP_ERROR_ON_BINDING,
     TCP_ERROR_ON_LISTEN,
     TCP_ERROR_ACCEPT_SOCKET,
+    TCP_ERROR_WRONG_SOCKET,
     TCP_ERROR_WRITE_TO_SOCKET,
     TCP_ERROR_READ_FROM_SOCKET,
     TCP_STATUS_NUM
-} tcpConStatus_t;
+} ConStatus_t;
 
-class tcpConnection {
+class Connection {
 public:
-    tcpConnection(int port_no) :
-            sockfd(), newsockfd(0), portno(port_no), clilen(0) {
-    }
-    ~tcpConnection(void) {
-    }
-    tcpConStatus_t changeIp(const char* ip, const char* mask, const char* gateway);
-    tcpConStatus_t setRoute(int sockfd, const char *gateway_addr);
-    tcpConStatus_t connect(void);
-    tcpConStatus_t receive(char* rcv_buffer, int rcv_buffer_len, int& received);
-    tcpConStatus_t send(const char* send_buffer, int send_buffer_len, int& sent);
-    void disconnect();
+    Connection(const std::string& interface,const int port) : interface_m(interface), port_m(port) {}
+    ~Connection(void) {}
+    ConStatus_t ChangeIp(const char* ip, const char* mask, const char* gateway);
+    ConStatus_t SetRoute(int socket_fd_m, const char *gateway_addr);
+    ConStatus_t Connect(void);
+    ConStatus_t Receive(char* rcv_buffer, int rcv_buffer_len, int& received);
+    ConStatus_t Send(const char* send_buffer, int send_buffer_len, int& sent);
+    void Disconnect();
+
 private:
-    int sockfd;
-    int newsockfd;
-    int portno;
-    unsigned int clilen;
-    char buffer[TCP_BUFFER_SIZE];
-    struct sockaddr_in serv_addr, cli_addr;
+    int socket_fd_m = -1;
+    int newsockfd_m = -1;
+    const std::string interface_m;
+    const int port_m = 0;
+    unsigned int client_m = 0;
+    struct sockaddr_in serv_addr_m, cli_addr_m;
 };
+
+} // namespace tcp
 
 #endif /* APP_TCP_CONNECTION_TCP_CONNECTION_HPP_ */

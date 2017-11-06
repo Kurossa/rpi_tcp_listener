@@ -4,7 +4,8 @@ if (TEST)
 		test/zip_test.cpp)
 
 	target_link_libraries(zip_test 
-		zip
+                app_utilities
+                zip
 		gtest
 		gtest_main)
 

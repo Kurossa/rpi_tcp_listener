@@ -13,6 +13,8 @@
 #include <string>
 #include <stdint.h>
 #include <unistd.h>
+#include <mutex>
+#include <condition_variable>
 
 typedef enum eMessageQueue {
     MQ_NO_MESSAGE = 0,
@@ -26,34 +28,41 @@ template <typename T>
 class cMessageQueue {
 public:
     cMessageQueue(void) {}
-    ~cMessageQueue() { pthread_mutex_destroy(&mu_queue);}
+    ~cMessageQueue() {}
 
-    void init(void) {
-        pthread_mutexattr_t mutexattr;
-        // Set the mutex as a recursive mutex
-        pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE_NP);
-        // create the mutex with the attributes set
-        pthread_mutex_init(&mu_queue, &mutexattr);
-        // After initializing the mutex, the thread attribute can be destroyed
-        pthread_mutexattr_destroy(&mutexattr);
+    void enqueue(T& msg) {
+        std::lock_guard<std::mutex> lock(queue_mutex);
+        msg_queue.push(msg);
+        queue_cond_var.notify_one();
+    }
+
+    T dequeue()
+    {
+        std::unique_lock<std::mutex> lock(queue_mutex);
+        while (msg_queue.empty())
+        {
+            queue_cond_var.wait(lock);
+        }
+        T ret_val = msg_queue.back();
+        msg_queue.pop();
+
+        return ret_val;
     }
 
     void push(T& msg) {
-        pthread_mutex_lock(&mu_queue);
+        std::lock_guard<std::mutex> lock(queue_mutex);
         msg_queue.push(msg);
-        pthread_mutex_unlock(&mu_queue);
+        queue_cond_var.notify_one();
     }
 
     eMessageQueue_t pop(T& msg) {
         int status = MQ_NUM;
-        pthread_mutex_lock(&mu_queue);
+        std::lock_guard<std::mutex> lock(queue_mutex);
         if (!msg_queue.empty()) {
             msg = msg_queue.back();
             msg_queue.pop();
-            pthread_mutex_unlock(&mu_queue);
             status = MQ_MSG_POP;
         } else {
-            pthread_mutex_unlock(&mu_queue);
             status = MQ_NO_MESSAGE;
         }
         return (eMessageQueue_t)status;
@@ -61,13 +70,11 @@ public:
 
     eMessageQueue_t poke(T& msg) {
         int status = MQ_NUM;
-        pthread_mutex_lock(&mu_queue);
+        std::lock_guard<std::mutex> lock(queue_mutex);
         if (!msg_queue.empty()) {
             msg = msg_queue.back();
-            pthread_mutex_unlock(&mu_queue);
             status = MQ_MSG_PENDING;
         } else {
-            pthread_mutex_unlock(&mu_queue);
             status = MQ_NO_MESSAGE;
         }
         return (eMessageQueue_t)status;
@@ -104,7 +111,8 @@ public:
     }
 private:
     std::queue<T> msg_queue;
-    pthread_mutex_t mu_queue;
+    std::mutex queue_mutex;
+    std::condition_variable queue_cond_var;
 };
 
 #endif /* UTILITIES_APP_MESSAGE_QUEUE_HPP_ */

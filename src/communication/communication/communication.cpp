@@ -101,7 +101,7 @@ void cCommunication::handleGetCfg(char* replyMsg) {
     if (CONFIG_MANAGER_OK == conifgManager_m->getConfigFile(configStream, configSize)) {
         error_code = ERROR_CODE_OK;
     }
-    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%lu\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, configSize, configStream, error_code);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%lu\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m, (long unsigned int)configSize, configStream, error_code);
 }
 
 void cCommunication::handleVolume(char* replyMsg) {

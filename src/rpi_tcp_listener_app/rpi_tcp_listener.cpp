@@ -111,9 +111,7 @@ int main(int argc, char** argv) {
 
         /* Initialize message queue(s) */
         mqSend_t mqSend;
-        mqSend.init();
         mqReply_t mqReply;
-        mqReply.init();
 
         /* Initialize mp3 server thread */
         cMp3Server mp3_server(&mqSend, &mqReply, devConfig.soundsInRam);
@@ -121,15 +119,15 @@ int main(int argc, char** argv) {
         logPrintf(SCREEN_LOG, "Sound server start.\n");
 
         /* TCP Connection */
-        tcpConnection tcp = tcpConnection(devConfig.port);
-        tcp.changeIp(devConfig.ipString.c_str(), devConfig.maskString.c_str(), devConfig.gatewayString.c_str());
+        tcp::Connection tcp = tcp::Connection(network_interface, devConfig.port);
+        tcp.ChangeIp(devConfig.ipString.c_str(), devConfig.maskString.c_str(), devConfig.gatewayString.c_str());
         usleep(500000);
-        tcp.connect();
+        tcp.Connect();
         logPrintf(SCREEN_LOG, "TCP server start.\n");
 
         /* Communication */
-        char cmdMsg[TCP_BUFFER_SIZE];
-        char replyMsg[TCP_BUFFER_SIZE];
+        char cmdMsg[tcp::BUFFER_SIZE];
+        char replyMsg[tcp::BUFFER_SIZE];
         cCommunication communication(&mqSend, &mqReply, &configManager);
 
         /* main loop */
@@ -137,9 +135,9 @@ int main(int argc, char** argv) {
             int recvdBytes, sentBytes;
             sprintf(replyMsg,"UNKNOWN_COMMAND\nEND\n");
 
-            if (TCP_NO_ERROR == tcp.receive(cmdMsg, TCP_BUFFER_SIZE, recvdBytes)) {
+            if (tcp::TCP_NO_ERROR == tcp.Receive(cmdMsg, tcp::BUFFER_SIZE, recvdBytes)) {
                 communication.handleCommand(cmdMsg, replyMsg);
-                tcp.send(replyMsg, strlen(replyMsg), sentBytes);
+                tcp.Send(replyMsg, strlen(replyMsg), sentBytes);
             }
 
             //printf("mqSend size = %d, mqReply size = %d\n", mqSend.size(), mqReply.size());
@@ -147,7 +145,7 @@ int main(int argc, char** argv) {
         }
         mp3_server.stopThread();
         logPrintf(SCREEN_LOG, "Sound server stop.\n");
-        tcp.disconnect();
+        tcp.Disconnect();
         logPrintf(SCREEN_LOG, "TCP server stop.\n");
     } else {
         logPrintf(ERROR_LOG, "Configuration Failed.\n");

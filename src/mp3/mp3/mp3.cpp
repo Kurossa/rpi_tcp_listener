@@ -8,6 +8,7 @@
 #include <utilities/logger.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <thread>
 
 #define MAX_INFINITE_LOOPS (100)
 #define MP3_SAMPLE_SIZE (16384)
