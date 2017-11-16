@@ -8,7 +8,7 @@
 #include <utilities/logger.h>
 #include <zip/zip.h>
 #include <mp3/mp3.h>
-#include <tcp_connection/tcp_connection.h>
+#include <tcp_connection/tcp_server.h>
 #include <communication/communication.h>
 #include <config_manager/config_manager.h>
 #include <signal.h>
@@ -119,10 +119,10 @@ int main(int argc, char** argv) {
         logPrintf(SCREEN_LOG, "Sound server start.\n");
 
         /* TCP Connection */
-        tcp::Connection tcp = tcp::Connection(network_interface, devConfig.port);
-        tcp.ChangeIp(devConfig.ipString.c_str(), devConfig.maskString.c_str(), devConfig.gatewayString.c_str());
+        tcp::Server server = tcp::Server(devConfig.port);
+        tcp::ChangeIp(std::string(network_interface), devConfig.ipString, devConfig.maskString, devConfig.gatewayString);
         usleep(500000);
-        tcp.Connect();
+        server.Connect();
         logPrintf(SCREEN_LOG, "TCP server start.\n");
 
         /* Communication */
@@ -135,9 +135,9 @@ int main(int argc, char** argv) {
             int recvdBytes, sentBytes;
             sprintf(replyMsg,"UNKNOWN_COMMAND\nEND\n");
 
-            if (tcp::TCP_NO_ERROR == tcp.Receive(cmdMsg, tcp::BUFFER_SIZE, recvdBytes)) {
+            if (tcp::TCP_NO_ERROR == server.Receive(cmdMsg, tcp::BUFFER_SIZE, recvdBytes)) {
                 communication.handleCommand(cmdMsg, replyMsg);
-                tcp.Send(replyMsg, strlen(replyMsg), sentBytes);
+                server.Send(replyMsg, strlen(replyMsg), sentBytes);
             }
 
             //printf("mqSend size = %d, mqReply size = %d\n", mqSend.size(), mqReply.size());
@@ -145,7 +145,7 @@ int main(int argc, char** argv) {
         }
         mp3_server.stopThread();
         logPrintf(SCREEN_LOG, "Sound server stop.\n");
-        tcp.Disconnect();
+        server.Disconnect();
         logPrintf(SCREEN_LOG, "TCP server stop.\n");
     } else {
         logPrintf(ERROR_LOG, "Configuration Failed.\n");

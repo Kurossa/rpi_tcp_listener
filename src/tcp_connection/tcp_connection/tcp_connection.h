@@ -1,12 +1,12 @@
 /*
- * tcp_connection.hpp
+ * tcp_connection.h
  *
  *  Created on: Apr 4, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
 
-#ifndef APP_TCP_CONNECTION_TCP_CONNECTION_HPP_
-#define APP_TCP_CONNECTION_TCP_CONNECTION_HPP_
+#ifndef APP_TCP_CONNECTION_TCP_CONNECTION_H_
+#define APP_TCP_CONNECTION_TCP_CONNECTION_H_
 
 #include <netinet/in.h>
 #include <string>
@@ -14,7 +14,9 @@
 namespace tcp
 {
 
+
 const int BUFFER_SIZE = 1024;
+const int MAX_CONNECTIONS = 10;
 
 typedef enum ConStatus {
     TCP_NO_ERROR = 0,
@@ -27,32 +29,39 @@ typedef enum ConStatus {
     TCP_ERROR_ON_BINDING,
     TCP_ERROR_ON_LISTEN,
     TCP_ERROR_ACCEPT_SOCKET,
+    TCP_ERROR_CONNECT_SOCKET,
+    TCP_ERROR_SERVER_ADDRESS,
     TCP_ERROR_WRONG_SOCKET,
     TCP_ERROR_WRITE_TO_SOCKET,
     TCP_ERROR_READ_FROM_SOCKET,
     TCP_STATUS_NUM
 } ConStatus_t;
 
+void CloseSocket(int& socket);
+
+ConStatus_t ChangeIp(  const std::string& interface
+                     , const std::string& ip
+                     , const std::string& mask
+                     , const std::string& gateway);
+
 class Connection {
 public:
-    Connection(const std::string& interface,const int port) : interface_m(interface), port_m(port) {}
+    Connection(const int port) : port_m(port) {}
     ~Connection(void) {}
-    ConStatus_t ChangeIp(const char* ip, const char* mask, const char* gateway);
-    ConStatus_t SetRoute(int socket_fd_m, const char *gateway_addr);
-    ConStatus_t Connect(void);
-    ConStatus_t Receive(char* rcv_buffer, int rcv_buffer_len, int& received);
-    ConStatus_t Send(const char* send_buffer, int send_buffer_len, int& sent);
-    void Disconnect();
 
-private:
-    int socket_fd_m = -1;
-    int newsockfd_m = -1;
-    const std::string interface_m;
+    ConStatus_t CreateSocket(void);
+    ConStatus_t ReceiveFromSocket(int socket_fd, char* rcv_buffer, int rcv_buffer_len, int& received);
+    ConStatus_t SendToSocket(int socket_fd, const char* send_buffer, int send_buffer_len, int& sent);
+    void ShutdownSocket();
+
+protected:
+    int conn_socket_fd_m = -1;
+    struct sockaddr_in my_addr_m;
     const int port_m = 0;
-    unsigned int client_m = 0;
-    struct sockaddr_in serv_addr_m, cli_addr_m;
+
 };
+
 
 } // namespace tcp
 
-#endif /* APP_TCP_CONNECTION_TCP_CONNECTION_HPP_ */
+#endif /* APP_TCP_CONNECTION_TCP_CONNECTION_H_ */
