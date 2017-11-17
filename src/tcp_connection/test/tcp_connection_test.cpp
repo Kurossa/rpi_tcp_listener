@@ -18,6 +18,7 @@ public:
     {
         logSetVerboseMode(true);
         logInit();
+        m_ready = false;
     }
 
      virtual void TearDown()
@@ -25,85 +26,83 @@ public:
         logClose();
     }
 
-    void RunServer() { server_async_m = std::async(&TcpConnection::ServerThread, this); }
-    void RunClient() { client_async_m = std::async(&TcpConnection::ClientThread, this); }
-    std::string GetResultFromServer() { return server_async_m.get(); }
-    std::string GetResultFromClient() { return client_async_m.get(); }
+    void ServerThread(int port, std::promise<std::string> && pr);
+    void ClientThread(  std::string test_string
+                      , std::string server_address
+                      , int port
+                      , std::promise<std::string> && pr);
 
-
-    std::string ServerThread();
-    std::string ClientThread();
 private:
-
-    std::future<std::string> server_async_m;
-    std::future<std::string> client_async_m;
-
     std::mutex m_mu;
     std::condition_variable m_cv;
     bool m_ready = false;
 };
 
-//bool TcpConnection::m_ready = false;
-
-std::string TcpConnection::ServerThread()
+void TcpConnection::ServerThread(int port, std::promise<std::string> && pr)
 {
     std::lock_guard<std::mutex> lock(m_mu);
-    char rcv[256] = {0};
-    int received = 0;
-    int my_port = 1123;
+    char rcv_from_client[tcp::BUFFER_SIZE] = {0};
+    int sent = 0, received = 0;
 
-    tcp::Server tcp_server(my_port);
+    tcp::Server tcp_server(port);
     tcp_server.Connect();
 
+    // Communicate client that server is ready.
     m_ready = true;
-    m_cv.notify_one();// notify_one();
+    m_cv.notify_one();
     m_mu.unlock();
 
-    tcp_server.Receive(rcv, 256, received);
-    printf("Server received: %s", rcv);
-    tcp_server.Send(rcv, 256, received);
+    tcp_server.Receive(rcv_from_client, tcp::BUFFER_SIZE, received);
+    tcp_server.Send(rcv_from_client, tcp::BUFFER_SIZE, sent);
     tcp_server.Disconnect();
-    return std::string(rcv);
+
+    pr.set_value(std::string(rcv_from_client));
 }
 
-std::string TcpConnection::ClientThread()
+void TcpConnection::ClientThread(  std::string test_string
+                                 , std::string server_address
+                                 , int port
+                                 , std::promise<std::string> && pr)
 {
+    // Wait for server thread to start listening.
     std::unique_lock<std::mutex> lock(m_mu);
     while (!m_ready) m_cv.wait(lock);
 
-    std::string send = "Dupa\n";
-    char rcv2[256] = {0};
+    char rcv_from_server[tcp::BUFFER_SIZE] = {0};
     int sent = 0, received = 0;
-    std::string my_address = "10.0.2.15";
-    int my_port = 1123;
-    tcp::Client tcp_client(my_address, my_port);
 
+    tcp::Client tcp_client(server_address, port);
     tcp_client.Connect();
-    tcp_client.Send(send.c_str(), send.length(), sent);
-    tcp_client.Receive(rcv2, 256, received);
-    printf("Client received: %s", rcv2);
+    tcp_client.Send(test_string.c_str(), test_string.length(), sent);
+    tcp_client.Receive(rcv_from_server, tcp::BUFFER_SIZE, received);
     tcp_client.Disconnect();
-    return std::string(rcv2);
+
+    pr.set_value(std::string(rcv_from_server));
 }
 
  
 TEST_F (TcpConnection, SendReceive) {
-    //RunClient();
-     //std::this_thread::sleep_for(std::chrono::microseconds(200));
-    //RunServer();
+    int port = 1234;
+    std::string server_address = "10.0.2.15";
+    std::string test_string = "Testing string ping-pong";
 
-    //GetResultFromClient();
-    //GetResultFromServer();
-   //auto a1 =  std::async(&TcpConnection::ServerThread, this);
-   //auto a2 =  std::async(&TcpConnection::ClientThread, this);
-   //a1.get();
-   //a2.get();
+    std::promise<std::string> server_pr;
+    std::future<std::string> server_future = server_pr.get_future();
+    std::promise<std::string> client_pr;
+    std::future<std::string> client_future = client_pr.get_future();
 
-   std::thread first (&TcpConnection::ServerThread, this);
-   std::thread second (&TcpConnection::ClientThread, this);
+    std::thread server_thread (&TcpConnection::ServerThread, this, port, std::move(server_pr));
+    std::thread client_thread (&TcpConnection::ClientThread, this, test_string, server_address, port, std::move(client_pr));
 
+    server_thread.join();
+    client_thread.join();
 
-   first.join();
-   second.join();
+    std::string server_result = server_future.get();
+    std::string client_result = client_future.get();
+
+    printf("Server value: %s\n", server_result.c_str());
+    printf("Client value: %s\n", client_result.c_str());
+
+    EXPECT_STREQ(client_result.c_str(), server_result.c_str());
 }
 
