@@ -83,7 +83,7 @@ void TcpConnection::ClientThread(  std::string test_string
  
 TEST_F (TcpConnection, SendReceive) {
     int port = 1234;
-    std::string server_address = "10.0.2.15";
+    std::string server_address = "127.0.0.1"; // Use loopback address: 127.0.0.1, or 'localhost'
     std::string test_string = "Testing string ping-pong";
 
     std::promise<std::string> server_pr;
