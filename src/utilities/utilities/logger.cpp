@@ -186,6 +186,10 @@ int logInit() {
 }
 
 void logPrintf(int iLevel, const char* pStrFormat, ...) {
+    if(!log_write_to_file_s && !log_verbose_mode_s) {
+        return;
+    }
+
     char acMsg[LOG_MSG_LEN + 1];
     char acDate[LOG_DATE_LEN + 1];
     char acBuf[LOG_BUF_LEN + 1];

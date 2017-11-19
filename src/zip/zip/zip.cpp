@@ -6,7 +6,7 @@
 #include <string.h>
 
 
-eZipStaus_t zip_uncompress(const char* source_name, const char* destination_name) {
+eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name) {
     eZipStaus_t status = ZIP_UNCOMP_FAILED;
     char buf_normal[1024];
     char buf_reversed[1024];
@@ -64,7 +64,7 @@ eZipStaus_t zip_uncompress(const char* source_name, const char* destination_name
     return status;
 }
 
-eZipStaus_t zip_compress(const char* source_name, const char* destination_name) {
+eZipStaus_t ZipCompress(const char* source_name, const char* destination_name) {
     eZipStaus_t status = ZIP_UNCOMP_FAILED;
     char buf_normal[1024];
     char buf_reversed[1024];

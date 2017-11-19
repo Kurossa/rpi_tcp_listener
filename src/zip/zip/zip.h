@@ -17,7 +17,7 @@ typedef enum eZipStatus {
     ZIP_NUM
 }eZipStaus_t;
 
-eZipStaus_t zip_uncompress(const char* source_name, const char* destination_name);
-eZipStaus_t zip_compress(const char* source_name, const char* destination_name);
+eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name);
+eZipStaus_t ZipCompress(const char* source_name, const char* destination_name);
 
 #endif

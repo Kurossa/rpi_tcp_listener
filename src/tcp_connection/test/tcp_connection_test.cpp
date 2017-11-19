@@ -16,14 +16,11 @@ class TcpConnection : public ::testing::Test
 public:
     virtual void SetUp()
     {
-        logSetVerboseMode(true);
-        logInit();
         m_ready = false;
     }
 
      virtual void TearDown()
     {
-        logClose();
     }
 
     void ServerThread(int port, std::promise<std::string> && pr);
@@ -93,6 +90,9 @@ TEST_F (TcpConnection, SendReceive) {
 
     std::thread server_thread (&TcpConnection::ServerThread, this, port, std::move(server_pr));
     std::thread client_thread (&TcpConnection::ClientThread, this, test_string, server_address, port, std::move(client_pr));
+
+    server_future.wait();
+    client_future.wait();
 
     server_thread.join();
     client_thread.join();

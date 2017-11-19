@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
         vector<string>::iterator encSound_it = devConfig.sounds.begin();
         vector<string>::iterator ramSound_it = devConfig.soundsInRam.begin();
         for (; encSound_it < devConfig.sounds.end(); ++encSound_it, ++ramSound_it) {
-            int status = zip_uncompress((*encSound_it).c_str(), (*ramSound_it).c_str());
+            int status = ZipUncompress((*encSound_it).c_str(), (*ramSound_it).c_str());
             if (ZIP_OK != status) {
                 ++errors_num;
                 logPrintf(ERROR_LOG, "Error decoding file: %s\n",(*encSound_it).c_str());
