@@ -9,6 +9,8 @@
 #include <config_manager/config_manager.h>
 #include <time/time.h>
 
+#include <string>
+
 #ifndef APP_COMMUNICATION_APP_COMMUNICATION_HPP_
 #define APP_COMMUNICATION_APP_COMMUNICATION_HPP_
 
@@ -37,10 +39,9 @@ private:
     sMp3Message mp3Cmd_m;
     sMp3Reply mp3Reply_m;
     cMsgParser msgParser_m;
-    cTime time_m;
 
     int command_m;
-    char time_str_m[32];
+    std::string time_str_m;
 
 };
 
