@@ -59,6 +59,7 @@ ConStatus_t tcp::ChangeIp(  const std::string& interface
                          , const std::string& mask
                          , const std::string& gateway) {
     struct ifreq ifr;
+    memset(&ifr, 0, sizeof(ifr));
     int socket_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
     if (-1 == socket_fd ) {
