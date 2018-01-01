@@ -27,7 +27,7 @@ namespace
 
 ConStatus_t SetRoute(int socket_fd, const std::string& gateway_addr) {
     struct rtentry route;
-    bzero(&route, sizeof(route));
+    memset(&route, 0, sizeof(route));
     struct sockaddr_in *addr = (struct sockaddr_in*) &route.rt_gateway;
     addr->sin_family = AF_INET;
     addr->sin_addr.s_addr = inet_addr(gateway_addr.c_str());
@@ -60,7 +60,7 @@ ConStatus_t tcp::ChangeIp(  const std::string& interface
                          , const std::string& mask
                          , const std::string& gateway) {
     struct ifreq ifr;
-    bzero(&ifr, sizeof(ifr));
+    memset(&ifr, 0, sizeof(ifr));
     int socket_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
     if (-1 == socket_fd ) {
@@ -106,7 +106,7 @@ ConStatus_t Connection::CreateSocket(void) {
     conn_socket_fd_m = socket(AF_INET, SOCK_STREAM, 0);
     //conn_socket_fd_m = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP ); // Create a UDP socket.
 
-    bzero(&my_addr_m, sizeof(my_addr_m));
+    memset(&my_addr_m, 0, sizeof(my_addr_m));
     my_addr_m.sin_family = AF_INET;
     my_addr_m.sin_addr.s_addr = INADDR_ANY; //inet_addr("127.0.0.1"); //INADDR_LOOPBACK; //INADDR_ANY;
     my_addr_m.sin_port = htons(port_m);
