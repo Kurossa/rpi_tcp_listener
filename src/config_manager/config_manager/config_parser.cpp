@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 using namespace std;
+using namespace utils;
 
 cConfigParser::cConfigParser(const char* fileName) {
     fileName_m = fileName;
@@ -27,20 +28,20 @@ eParserStatus_t cConfigParser::getConfig(const char* descr, vector<string>& dest
                 } else if (fs.getline(line, sizeof(line))) { // if no } in this line read next line, contract to old one
                     l += string(line);
                 } else {
-                    logPrintf(ERROR_LOG, "ConfigParser: No } for descriptor: %s \n", descr); //if no "}" till EOF
+                    logPrintf(LogLevel::ERROR, "ConfigParser: No } for descriptor: %s \n", descr); //if no "}" till EOF
                 }
             }
             if (l.find("{") != string::npos) {
                 string cfg = l.substr(l.find("{"), l.rfind("}"));
                 destVec.push_back(cfg);
             } else {
-                logPrintf(ERROR_LOG, "ConfigParser: No { for descriptor: %s \n", descr);
+                logPrintf(LogLevel::ERROR, "ConfigParser: No { for descriptor: %s \n", descr);
             }
         }
     }
     fs.close();
     if (destVec.empty()) {
-        logPrintf(ERROR_LOG, "ConfigParser: Configuration empty for descriptor: %s \n", descr);
+        logPrintf(LogLevel::ERROR, "ConfigParser: Configuration empty for descriptor: %s \n", descr);
         status = PARSER_CONF_EMPTY;
     } else {
         status = PARSER_CONF_OK;
@@ -57,13 +58,13 @@ eParserStatus_t cConfigParser::getAttrVal(string& output, string attrLst, string
             output = attrLst.substr(pos + attr.length() + 1, endPos - pos - attr.length() - 1);
             status = PARSER_CONF_OK;
         } else {
-            logPrintf(ERROR_LOG, "ConfigParser: No \",\" between attributes.\n");
+            logPrintf(LogLevel::ERROR, "ConfigParser: No \",\" between attributes.\n");
         }
     } else if (optional) {
         output = "";
         status = PARSER_CONF_OK;
     } else {
-        logPrintf(ERROR_LOG, "ConfigParser: No required attribute \"%s\" found.", attr.c_str());
+        logPrintf(LogLevel::ERROR, "ConfigParser: No required attribute \"%s\" found.", attr.c_str());
     }
     return status;
 }

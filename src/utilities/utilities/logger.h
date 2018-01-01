@@ -5,34 +5,40 @@
  *      Author: mariusz
  */
 
-#ifndef UTILITIES_APP_LOGGER_HPP_
-#define UTILITIES_APP_LOGGER_HPP_
+#ifndef UTILITIES_LOGGER_HPP_
+#define UTILITIES_LOGGER_HPP_
 
-#include <stdio.h>
+#include <cstdio>
+#include <cstdint>
 
-#define MAX_LOG_LINE_NUM    10000 /* Max line number of a single file */
-#define MAX_LOG_FILE_NUM    99
-#define MAX_LOG_FILES       5
-#define LOG_BUF_LEN         256
-#define LOG_MSG_LEN         128
-#define LOG_FILENAME_LEN    64
-#define LOG_DATE_LEN        32
-#define LOG_MODULE_LEN      16
-#define LOG_MAX_LEVEL_NAME  8
-#define LOG_MAX_LEVEL       4
+namespace utils
+{
 
-typedef enum elogLevel {
-    INFO_LOG,
-    WARNING_LOG,
-    ERROR_LOG,
-    SCREEN_LOG
-} elogLevel_t;
+const uint16_t MAX_LOG_LINE_NUM     = 10000; //Max line number of a single file
+const uint16_t MAX_LOG_FILE_NUM     = 99;
+const uint16_t MAX_LOG_FILES        = 5;
+const uint16_t LOG_BUF_LEN          = 256;
+const uint16_t LOG_MSG_LEN          = 128;
+const uint16_t LOG_FILENAME_LEN     = 64;
+const uint16_t LOG_DATE_LEN         = 32;
+const uint16_t LOG_MODULE_LEN       = 16;
+const uint16_t LOG_MAX_LEVEL_NAME   = 8;
 
-extern FILE *pLogFile_g; /* Log file handler */
+enum LogLevel {
+    INFO,
+    WARNING,
+    ERROR,
+    SCREEN,
+    MAX_LEVEL
+};
+
+//extern FILE *pLogFile_g; /* Log file handler */
 int logInit();
 void logPrintf(int level, const char* format, ...);
 void logClose();
 void logSetVerboseMode(bool value);
 void logSetLogToFile(bool value);
 
-#endif /* UTILITIES_APP_LOGGER_HPP_ */
+} //namespace utils
+
+#endif // UTILITIES_LOGGER_HPP_

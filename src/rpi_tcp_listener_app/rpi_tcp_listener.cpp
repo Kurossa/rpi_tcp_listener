@@ -15,8 +15,10 @@
 #include <getopt.h>
 #include <string.h>
 
-
-using namespace std;
+using namespace utils;
+using std::string;
+using std::list;
+using std::vector;
 
 /* Globals */
 int STOP_PROCCESS = 0;
@@ -24,21 +26,21 @@ int STOP_PROCCESS = 0;
 /* Main additional functions */
 static void signal_interrupt_handler(int signo) {
     if (signo == SIGINT) {
-        logPrintf(SCREEN_LOG, "Interrupting application.\n");
+        logPrintf(LogLevel::SCREEN, "Interrupting application.\n");
         STOP_PROCCESS = 1;
     } else if (signo == SIGTERM) {
-        logPrintf(SCREEN_LOG, "Terminating application.\n");
+        logPrintf(LogLevel::SCREEN, "Terminating application.\n");
         STOP_PROCCESS = 1;
     }
 }
 
 void init_signal_interrupt_handler() {
     if (signal(SIGINT, signal_interrupt_handler) == SIG_ERR) {
-        logPrintf(SCREEN_LOG, "Cannot handle SIGINT \n");
+        logPrintf(LogLevel::SCREEN, "Cannot handle SIGINT \n");
     }
 
     if (signal(SIGTERM, signal_interrupt_handler) == SIG_ERR) {
-        logPrintf(SCREEN_LOG, "Cannot handle SIGTERM \n");
+        logPrintf(LogLevel::SCREEN, "Cannot handle SIGTERM \n");
     }
 }
 
@@ -82,7 +84,7 @@ int main(int argc, char** argv) {
     /* Initialize logger */
     logInit();
     init_signal_interrupt_handler();
-    logPrintf(SCREEN_LOG, "Starting application.\n");
+    logPrintf(LogLevel::SCREEN, "Starting application.\n");
 
     /* Configuration Manager */
     cConfigManager configManager(config_file);
@@ -103,11 +105,11 @@ int main(int argc, char** argv) {
             int status = ZipUncompress((*encSound_it).c_str(), (*ramSound_it).c_str());
             if (ZIP_OK != status) {
                 ++errors_num;
-                logPrintf(ERROR_LOG, "Error decoding file: %s\n",(*encSound_it).c_str());
+                logPrintf(LogLevel::ERROR, "Error decoding file: %s\n",(*encSound_it).c_str());
             }
             //printf("unzip %s to %s, with status %d\n", (*encSound_it).c_str(), (*ramSound_it).c_str(), status);
         }
-        logPrintf(SCREEN_LOG, "Configuration done.\n");
+        logPrintf(LogLevel::SCREEN, "Configuration done.\n");
 
         /* Initialize message queue(s) */
         mqSend_t mqSend;
@@ -116,14 +118,14 @@ int main(int argc, char** argv) {
         /* Initialize mp3 server thread */
         cMp3Server mp3_server(&mqSend, &mqReply, devConfig.soundsInRam);
         mp3_server.startThread();
-        logPrintf(SCREEN_LOG, "Sound server start.\n");
+        logPrintf(LogLevel::SCREEN, "Sound server start.\n");
 
         /* TCP Connection */
         tcp::Server server = tcp::Server(devConfig.port);
         tcp::ChangeIp(std::string(network_interface), devConfig.ipString, devConfig.maskString, devConfig.gatewayString);
         usleep(500000);
         server.Connect();
-        logPrintf(SCREEN_LOG, "TCP server start.\n");
+        logPrintf(LogLevel::SCREEN, "TCP server start.\n");
 
         /* Communication */
         char cmdMsg[tcp::BUFFER_SIZE];
@@ -144,14 +146,14 @@ int main(int argc, char** argv) {
             //printf("Received = %d, Sent = %d\n", recvdBytes, sentBytes);
         }
         mp3_server.stopThread();
-        logPrintf(SCREEN_LOG, "Sound server stop.\n");
+        logPrintf(LogLevel::SCREEN, "Sound server stop.\n");
         server.Disconnect();
-        logPrintf(SCREEN_LOG, "TCP server stop.\n");
+        logPrintf(LogLevel::SCREEN, "TCP server stop.\n");
     } else {
-        logPrintf(ERROR_LOG, "Configuration Failed.\n");
+        logPrintf(LogLevel::ERROR, "Configuration Failed.\n");
     }
 
-    logPrintf(SCREEN_LOG, "End application.\n");
+    logPrintf(LogLevel::SCREEN, "End application.\n");
     logClose();
     return 0;
 }

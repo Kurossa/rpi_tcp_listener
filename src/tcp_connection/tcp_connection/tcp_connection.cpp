@@ -20,13 +20,14 @@
 #include <string.h>
 
 using namespace tcp;
+using namespace utils;
 
 namespace
 {
 
 ConStatus_t SetRoute(int socket_fd, const std::string& gateway_addr) {
     struct rtentry route;
-    memset(&route, 0, sizeof(route));
+    bzero(&route, sizeof(route));
     struct sockaddr_in *addr = (struct sockaddr_in*) &route.rt_gateway;
     addr->sin_family = AF_INET;
     addr->sin_addr.s_addr = inet_addr(gateway_addr.c_str());
@@ -59,6 +60,7 @@ ConStatus_t tcp::ChangeIp(  const std::string& interface
                          , const std::string& mask
                          , const std::string& gateway) {
     struct ifreq ifr;
+    bzero(&ifr, sizeof(ifr));
     int socket_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP);
 
     if (-1 == socket_fd ) {
@@ -104,7 +106,7 @@ ConStatus_t Connection::CreateSocket(void) {
     conn_socket_fd_m = socket(AF_INET, SOCK_STREAM, 0);
     //conn_socket_fd_m = socket( AF_INET, SOCK_DGRAM, IPPROTO_UDP ); // Create a UDP socket.
 
-    bzero((char *) &my_addr_m, sizeof(my_addr_m));
+    bzero(&my_addr_m, sizeof(my_addr_m));
     my_addr_m.sin_family = AF_INET;
     my_addr_m.sin_addr.s_addr = INADDR_ANY; //inet_addr("127.0.0.1"); //INADDR_LOOPBACK; //INADDR_ANY;
     my_addr_m.sin_port = htons(port_m);
@@ -123,11 +125,11 @@ ConStatus_t Connection::ReceiveFromSocket(int socket_fd, char* rcv_buffer, int r
         bzero(rcv_buffer, rcv_buffer_len);
         received = read(socket_fd, rcv_buffer, rcv_buffer_len);
         if (received < 0) {
-            logPrintf(ERROR_LOG, "ERROR reading from socket\n");
+            logPrintf(LogLevel::ERROR, "ERROR reading from socket\n");
             return TCP_ERROR_READ_FROM_SOCKET;
         }
     } else {
-        logPrintf(ERROR_LOG, "ERROR no socket to receive from\n");
+        logPrintf(LogLevel::ERROR, "ERROR no socket to receive from\n");
         return TCP_ERROR_WRONG_SOCKET;
     }
 
@@ -138,12 +140,12 @@ ConStatus_t Connection::SendToSocket(int socket_fd, const char* send_buffer, int
     if (socket_fd >= 0) {
         sent = write(socket_fd, send_buffer, send_buffer_len);
         if (sent < 0) {
-            logPrintf(ERROR_LOG, "ERROR writing to socket\n");
+            logPrintf(LogLevel::ERROR, "ERROR writing to socket\n");
             return TCP_ERROR_WRITE_TO_SOCKET;
         }
         return TCP_NO_ERROR;
     } else {
-        logPrintf(ERROR_LOG, "ERROR no socket to write\n");
+        logPrintf(LogLevel::ERROR, "ERROR no socket to write\n");
         return TCP_ERROR_WRONG_SOCKET;
     }
 }

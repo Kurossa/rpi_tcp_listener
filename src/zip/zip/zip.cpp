@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <string.h>
 
+using namespace utils;
 
 eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name) {
     eZipStaus_t status = ZIP_UNCOMP_FAILED;
@@ -15,7 +16,7 @@ eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name)
     bool isOdd = false;
 
     if (source_name == destination_name || strcmp(source_name, destination_name) == 0) {
-        logPrintf(ERROR_LOG, "Uncompress failed: same source and destination.\n");
+        logPrintf(LogLevel::ERROR, "Uncompress failed: same source and destination.\n");
         status = ZIP_SAME_SRC_DST;
     } else {
         // check if file exists
@@ -57,7 +58,7 @@ eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name)
             status = ZIP_OK;
         } else {
             status = ZIP_FILE_NOT_EXISTS;
-            logPrintf(ERROR_LOG, "Uncompress failed: Source file does not exists.\n");
+            logPrintf(LogLevel::ERROR, "Uncompress failed: Source file does not exists.\n");
         }
     }
 
@@ -74,7 +75,7 @@ eZipStaus_t ZipCompress(const char* source_name, const char* destination_name) {
 
     if (source_name == destination_name || strcmp(source_name, destination_name) == 0) {
         status = ZIP_SAME_SRC_DST;
-        logPrintf(ERROR_LOG, "Compress failed: same source and destination.\n");
+        logPrintf(LogLevel::ERROR, "Compress failed: same source and destination.\n");
     } else {
         FILE* source = fopen(source_name, "rb");
         if (source) {
@@ -114,7 +115,7 @@ eZipStaus_t ZipCompress(const char* source_name, const char* destination_name) {
             status = ZIP_OK;
         } else {
             status = ZIP_FILE_NOT_EXISTS;
-            logPrintf(ERROR_LOG, "Compress failed: Source file does not exists.\n");
+            logPrintf(LogLevel::ERROR, "Compress failed: Source file does not exists.\n");
         }
     }
     return status;

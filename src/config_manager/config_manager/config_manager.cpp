@@ -5,7 +5,11 @@
 #include <sstream>
 #include <termios.h>
 
-using namespace std;
+using std::vector;
+using std::string;
+using std::istringstream;
+using std::skipws;
+using namespace utils;
 
 static string removeSpaces(string input) {
     string output;
@@ -33,7 +37,7 @@ eConfigManager_t cConfigManager::init() {
             cmStatus |= get_port(*it, devConfig.port);
 
             if (cmStatus == CONFIG_MANAGER_OK) {
-                logPrintf(SCREEN_LOG, "Ethernet configuration: ip address: %s:%d, mask: %s, gateway: %s\n"
+                logPrintf(LogLevel::SCREEN, "Ethernet configuration: ip address: %s:%d, mask: %s, gateway: %s\n"
                         , devConfig.ipString.c_str()
                         , devConfig.port
                         , devConfig.maskString.c_str()
@@ -50,19 +54,19 @@ eConfigManager_t cConfigManager::init() {
                         deviceConfigList_m.push_back(devConfig);
                         status = CONFIG_MANAGER_OK;
                     } else {
-                        logPrintf(ERROR_LOG, "Config file - Wrong sounds parameters.\n");
+                        logPrintf(LogLevel::ERROR, "Config file - Wrong sounds parameters.\n");
                     }
                 }
             } else {
-                logPrintf(ERROR_LOG, "Config file - Wrong parameters.\n");
+                logPrintf(LogLevel::ERROR, "Config file - Wrong parameters.\n");
             }
         }
     } else {
-        logPrintf(ERROR_LOG, "Config file - No configuration in config file. \n");
+        logPrintf(LogLevel::ERROR, "Config file - No configuration in config file. \n");
     }
 
     if (deviceConfigList_m.empty()) {
-        logPrintf(ERROR_LOG, "Config file - No devices configured.\n");
+        logPrintf(LogLevel::ERROR, "Config file - No devices configured.\n");
     }
 
     return status;
@@ -128,7 +132,7 @@ eConfigManager_t cConfigManager::get_sounds(string descr, vector<string>& sounds
         istringstream(val) >> skipws >> val;
         int soundsNum = 0;
         getAttrNum(soundsNum,val);
-        logPrintf(SCREEN_LOG,"Sound(s) number: %d\n",soundsNum);
+        logPrintf(LogLevel::SCREEN,"Sound(s) number: %d\n",soundsNum);
         int soundsStatus = CONFIG_MANAGER_OK;
         for (int i = 0; i < soundsNum; ++i) {
             string attrByNum;
@@ -140,7 +144,7 @@ eConfigManager_t cConfigManager::get_sounds(string descr, vector<string>& sounds
                 string ramFile(ram);
                 ramFile.append(attrByNum);
                 soundsInRam.push_back(ramFile);
-                logPrintf(SCREEN_LOG,"Sound %d name: %s\n",i+1, attrByNum.c_str());
+                logPrintf(LogLevel::SCREEN,"Sound %d name: %s\n",i+1, attrByNum.c_str());
             }
         }
 
