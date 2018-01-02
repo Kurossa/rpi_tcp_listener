@@ -1,4 +1,3 @@
-include_directories(${gtest_SOURCE_DIR}/include)
 add_executable(tcp_connection_test
     tcp_connection_test.cpp)
 

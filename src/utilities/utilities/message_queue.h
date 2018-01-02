@@ -5,16 +5,18 @@
  *      Author: mariusz
  */
 
-#ifndef UTILITIES_APP_MESSAGE_QUEUE_HPP_
-#define UTILITIES_APP_MESSAGE_QUEUE_HPP_
+#ifndef UTILITIES_MESSAGE_QUEUE_HPP_
+#define UTILITIES_MESSAGE_QUEUE_HPP_
 
-#include <pthread.h>
 #include <queue>
 #include <string>
 #include <stdint.h>
 #include <unistd.h>
 #include <mutex>
 #include <condition_variable>
+
+namespace utils
+{
 
 typedef enum eMessageQueue {
     MQ_NO_MESSAGE = 0,
@@ -41,6 +43,7 @@ public:
         std::unique_lock<std::mutex> lock(queue_mutex);
         while (msg_queue.empty())
         {
+            //TODO: add member variable as posix can break waiting (as security reason)
             queue_cond_var.wait(lock);
         }
         T ret_val = msg_queue.back();
@@ -115,4 +118,5 @@ private:
     std::condition_variable queue_cond_var;
 };
 
-#endif /* UTILITIES_APP_MESSAGE_QUEUE_HPP_ */
+}
+#endif // UTILITIES_MESSAGE_QUEUE_HPP_

@@ -14,8 +14,9 @@ using namespace mp3server;
 Status PlayerStopState::Play(std::string file_name)
 {
     printf("Stop state, play file: %s\n", file_name.c_str());
-    GetPlayer().RunPlayThread(file_name);
-    GetPlayer().SetState(new PlayerPlayState(GetPlayer()));
+
+    mp3_player_m.RunPlayThread(file_name);
+    mp3_player_m.SetState(new PlayerPlayState(mp3_player_m));
     return Status::IDLE;
 }
 

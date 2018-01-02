@@ -11,6 +11,8 @@
 #include <sys/time.h>
 #include <cctype>
 
+using namespace utils;
+
 namespace
 {
 
@@ -78,7 +80,7 @@ eTimeStatus_t LinuxTime::SetTime(const std::string& time_string) {
 
         const struct timeval tv = { mktime(tm_ptr), 0 };
         int time_status = settimeofday(&tv, 0);
-        logPrintf(SCREEN_LOG, "Set time: %02d:%02d:%02d_%02d.%02d.%04d, status = %d\n",tm_ptr->tm_hour, tm_ptr->tm_min, tm_ptr->tm_sec, tm_ptr->tm_mday, tm_ptr->tm_mon+1, tm_ptr->tm_year + 1900, time_status);
+        logPrintf(LogLevel::SCREEN, "Set time: %02d:%02d:%02d_%02d.%02d.%04d, status = %d\n",tm_ptr->tm_hour, tm_ptr->tm_min, tm_ptr->tm_sec, tm_ptr->tm_mday, tm_ptr->tm_mon+1, tm_ptr->tm_year + 1900, time_status);
 
         return TIME_SET_OK;
     }

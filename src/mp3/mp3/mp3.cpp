@@ -4,6 +4,7 @@
  *  Created on: Apr 12, 2016
  *      Author: mariusz
  */
+
 #include "mp3.h"
 #include <utilities/logger.h>
 #include <unistd.h>
@@ -14,7 +15,7 @@
 #define MP3_SAMPLE_SIZE (16384)
 #define BITS (8)
 
-using namespace std;
+using namespace utils;
 
 int cMp3Server::startThread(void) {
     int status = 0;
@@ -33,7 +34,7 @@ int cMp3Server::stopThread(void) {
 void* cMp3Server::action(void) {
     sMp3Message msg;
     while (threadRunning_m) {
-        if (MQ_MSG_POP == mqSend_m->wait(msg, 1)) {
+        if (utils::MQ_MSG_POP == mqSend_m->wait(msg, 1)) {
             handleMessage(msg);
         }
     }
@@ -129,23 +130,23 @@ void cMp3Server::playMp3(sMp3Message& msg) {
                 /* MP3 DECODE CODE HERE */
                 ao_play(ao_dev_m, (char *) buffer_mpg_m, buffer_mpg_done_m);
                 /* MP3 DECODE CODE HERE */
-                if (MQ_MSG_PENDING == mqSend_m->poke(msg_poke)) {
+                if (utils::MQ_MSG_PENDING == mqSend_m->poke(msg_poke)) {
                     switch (msg_poke.action) {
                     case MP3_VOLUME:
-                        if (MQ_MSG_POP == mqSend_m->pop(msg_poke)) {
+                        if (utils::MQ_MSG_POP == mqSend_m->pop(msg_poke)) {
                             setVolume(msg_poke.parameter);
                         } else {
-                            logPrintf(ERROR_LOG, "cMp3Server: Message was pending, but not received.\n");
+                            logPrintf(LogLevel::ERROR, "cMp3Server: Message was pending, but not received.\n");
                         }
                         break;
                     case MP3_PLAY:
-                        if (MQ_MSG_POP != mqSend_m->pop(msg_poke)) {
-                            logPrintf(ERROR_LOG, "cMp3Server: Message was pending, but not received.\n");
+                        if (utils::MQ_MSG_POP != mqSend_m->pop(msg_poke)) {
+                            logPrintf(LogLevel::ERROR, "cMp3Server: Message was pending, but not received.\n");
                         }
                         break;
                     case MP3_STATUS:
-                        if (MQ_MSG_POP != mqSend_m->pop(msg_poke)) {
-                            logPrintf(ERROR_LOG, "cMp3Server: Message was pending, but not received.\n");
+                        if (utils::MQ_MSG_POP != mqSend_m->pop(msg_poke)) {
+                            logPrintf(LogLevel::ERROR, "cMp3Server: Message was pending, but not received.\n");
                         }
                         break;
                     default:

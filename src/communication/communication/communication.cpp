@@ -5,20 +5,19 @@
  *      Author: mariusz
  */
 #include "communication.h"
-#include <utilities/file_handler.h>
 #include <utilities/logger.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-using namespace std;
+using namespace utils;
 
 void cCommunication::handleCommand(char* cmdMsg, char* replyMsg) {
     //printf("Received: %s", cmdMsg);
     msgParser_m.parseMsg(cmdMsg, strlen(cmdMsg));
     LinuxTime::GetTime(time_str_m);
     command_m = msgParser_m.getMsgCommand();
-    logPrintf(SCREEN_LOG, "Received %d command\n", command_m);
+    logPrintf(LogLevel::SCREEN, "Received %d command\n", command_m);
 
     switch (command_m) {
     case TCP_SET_TIME:
@@ -115,7 +114,7 @@ void cCommunication::handleVolume(char* replyMsg) {
 }
 
 void cCommunication::handleReset(char* replyMsg) {
-    logPrintf(SCREEN_LOG, "system reboot!\n");
+    logPrintf(LogLevel::SCREEN, "system reboot!\n");
     system("reboot");
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), ERROR_CODE_OK);
 }

@@ -19,6 +19,8 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
+using namespace utils;
+
 static FILE * pLogFile_s = NULL;
 static char pDirName_s[] = "log/";
 static char pLogDirName_s[128] = "";
@@ -26,6 +28,7 @@ static char pLogFileName_s[] = "log";
 static unsigned int LogFileNum_s = 0;
 static unsigned int LogLineCount_s = 0;
 
+//const char KNRM[] =  "\x1B[0m";
 #define KNRM  "\x1B[0m"
 #define KRED  "\x1B[31m"
 #define KGRN  "\x1B[32m"
@@ -40,7 +43,7 @@ static bool log_verbose_mode_s = false;
 static bool log_write_to_file_s = false;
 
 /* Log level */
-static char s_acLevel[LOG_MAX_LEVEL][LOG_MAX_LEVEL_NAME] = { "INF", "WAR", "ERR", "INF" };
+static char s_acLevel[LogLevel::MAX_LEVEL][LOG_MAX_LEVEL_NAME] = { "INF", "WAR", "ERR", "INF" };
 
 static void logGetCompactTimestamp(char *pStrBuf) {
     time_t now;
@@ -137,15 +140,15 @@ static void logRemoveLogs(void) {
     closedir(dp);
 }
 
-void logSetVerboseMode(bool value) {
+void utils::logSetVerboseMode(bool value) {
     log_verbose_mode_s = value;
 }
 
-void logSetLogToFile(bool value) {
+void utils::logSetLogToFile(bool value) {
     log_write_to_file_s = value;
 }
 
-int logInit() {
+int utils::logInit() {
     //log_verbose_mode_s
     //log_write_to_file_s
     if (log_write_to_file_s) {
@@ -185,7 +188,7 @@ int logInit() {
     return 0;
 }
 
-void logPrintf(int iLevel, const char* pStrFormat, ...) {
+void utils::logPrintf(int iLevel, const char* pStrFormat, ...) {
     if(!log_write_to_file_s && !log_verbose_mode_s) {
         return;
     }
@@ -198,7 +201,7 @@ void logPrintf(int iLevel, const char* pStrFormat, ...) {
     va_start(list, pStrFormat);
 
     /* Parameters check */
-    if (iLevel >= LOG_MAX_LEVEL) {
+    if (iLevel >= LogLevel::MAX_LEVEL) {
         assert(0);
     }
 
@@ -217,9 +220,9 @@ void logPrintf(int iLevel, const char* pStrFormat, ...) {
 
     if (log_verbose_mode_s) {
         /* Output the error message directly to screen. */
-        if (iLevel == ERROR_LOG) {
+        if (iLevel == LogLevel::ERROR) {
             printf("%s%s%s\r", KRED,acBuf,KNRM);
-        } else if (iLevel == SCREEN_LOG) {
+        } else if (iLevel == LogLevel::SCREEN) {
             printf("%s%s%s\r", KGRN,acBuf,KNRM);
         }
     }
@@ -246,7 +249,7 @@ void logPrintf(int iLevel, const char* pStrFormat, ...) {
     return;
 }
 
-void logClose() {
+void utils::logClose() {
     if (log_write_to_file_s) {
         if (NULL == pLogFile_s) {
             return;

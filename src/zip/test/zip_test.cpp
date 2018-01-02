@@ -171,7 +171,7 @@ TEST_F (ZipTest, ZipSameSourceAsDestination) {
     EXPECT_EQ(status, ZIP_SAME_SRC_DST);
 }
 
-TEST_F (ZipTest, ZipSameFileNotExists) {
+TEST_F (ZipTest, ZipFileNotExists) {
         eZipStaus_t status = ZIP_NUM;
         char input_zip[25] = "not_existing_file.txt";
         status = ZipCompress(input_zip, output_file_name_m.c_str());

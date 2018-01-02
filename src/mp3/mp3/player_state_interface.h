@@ -27,11 +27,11 @@ public:
     virtual Status Pause() = 0;
     virtual Status Stop() = 0;
     virtual Status SetVolume(uint16_t volume) = 0;
-    Mp3Player& GetPlayer() { return mp3_player_m; }
 
-    virtual void OnEnter() {}
-    virtual void OnLeave() {}
-private:
+    virtual void OnEnter() {} // Method used on entering new state during switch
+    virtual void OnLeave() {} // Method used on leaving new state during switch
+
+protected:
     Mp3Player& mp3_player_m;
 };
 

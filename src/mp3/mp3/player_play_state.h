@@ -16,11 +16,8 @@ namespace mp3server
 class PlayerPlayState : public PlayerState
 {
 public:
-    PlayerPlayState(Mp3Player& mp3_player) : PlayerState(mp3_player)
-    {
-         printf("C-tor PLay state\n");
-    }
-    ~PlayerPlayState() { printf("De-tor PLay state\n"); }
+    PlayerPlayState(Mp3Player& mp3_player) : PlayerState(mp3_player) {}
+    ~PlayerPlayState() {}
     Status Play(std::string file_name) override final;
     Status Pause() override final;
     Status Stop() override final;

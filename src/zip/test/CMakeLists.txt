@@ -1,4 +1,3 @@
-include_directories(${gtest_SOURCE_DIR}/include)
 add_executable(zip_test
     zip_test.cpp)
 

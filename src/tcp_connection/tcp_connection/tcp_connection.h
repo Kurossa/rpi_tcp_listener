@@ -14,9 +14,8 @@
 namespace tcp
 {
 
-
-const int BUFFER_SIZE = 1024;
-const int MAX_CONNECTIONS = 10;
+const uint16_t BUFFER_SIZE = 1024;
+const uint16_t MAX_CONNECTIONS = 10;
 
 typedef enum ConStatus {
     TCP_NO_ERROR = 0,
@@ -60,7 +59,6 @@ protected:
     const int port_m = 0;
 
 };
-
 
 } // namespace tcp
 

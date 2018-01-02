@@ -27,6 +27,8 @@ namespace mp3server
 
 class Mp3Player
 {
+    friend class PlayerStopState;
+    friend class PlayerPlayState;
 
 public:
     Mp3Player():

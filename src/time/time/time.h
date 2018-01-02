@@ -5,8 +5,8 @@
  *      Author: mariusz
  */
 
-#ifndef APP_TIME_APP_TIME_HPP_
-#define APP_TIME_APP_TIME_HPP_
+#ifndef TIME_HPP_
+#define TIME_HPP_
 
 #include <string>
 
@@ -26,6 +26,6 @@ typedef enum eTimeStatus {
 eTimeStatus_t GetTime(std::string& time_string);
 eTimeStatus_t SetTime(const std::string& time_string);
 
-}
+} //namespace LinuxTime
 
-#endif /* APP_TIME_APP_TIME_HPP_ */
+#endif // TIME_HPP_
