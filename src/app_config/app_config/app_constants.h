@@ -8,6 +8,8 @@
 #ifndef APP_CONSTS_HPP_
 #define APP_CONSTS_HPP_
 
+#define UNUSED_PARAM(expr) do { (void)(expr); } while (0)
+
 /* Location of configuration file */
 const char config_file[] = "/etc/audio_app.cfg";
 /* Location audio files in ram (/tmp/ is ramfs) */
