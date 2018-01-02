@@ -27,10 +27,10 @@ void Mp3Player::SetState(PlayerState* new_state)
     state_m->OnEnter();
 }
 
-Status Mp3Player::Play(std::string file_name)
+Status Mp3Player::Play(std::string file_name, PlayMode play_mode)
 {
     lock_guard<mutex> lock(state_mutex_m);
-    return state_m->Play(file_name);
+    return state_m->Play(file_name, play_mode);
 }
 
 Status Mp3Player::Pause()
@@ -51,14 +51,14 @@ Status Mp3Player::SetVolume(uint16_t volume)
     return state_m->SetVolume(volume);
 }
 
-void Mp3Player::RunPlayThread(std::string& file_name)
+void Mp3Player::RunPlayThread(std::string& file_name, PlayMode play_mode)
 {
     {
         lock_guard<mutex> lock(play_thread_mutex_m);
         play_thread_stop_m = false;
     }
     InitPlayer();
-    play_thread_m = std::thread(&Mp3Player::DoPlay, this, file_name );
+    play_thread_m = std::thread(&Mp3Player::DoPlay, this, file_name, play_mode);
 }
 
 void Mp3Player::StopPlayThread()
@@ -73,9 +73,11 @@ void Mp3Player::StopPlayThread()
     ResetPlayer();
 }
 
-void Mp3Player::DoPlay(std::string file_name)
+void Mp3Player::DoPlay(std::string file_name, PlayMode play_mode)
 {
+    //TODO: Add implementation
     UNUSED_PARAM(file_name);
+    UNUSED_PARAM(play_mode);
     int n = 50;
     bool stop_loop = false;
     do

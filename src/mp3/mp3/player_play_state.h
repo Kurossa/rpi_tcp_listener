@@ -16,15 +16,20 @@ namespace mp3server
 class PlayerPlayState : public PlayerState
 {
 public:
-    PlayerPlayState(Mp3Player& mp3_player) : PlayerState(mp3_player) {}
+    PlayerPlayState(Mp3Player& mp3_player, std::string& file_name, PlayMode play_mode);
     ~PlayerPlayState() {}
-    Status Play(std::string file_name) override final;
+    Status Play(std::string file_name, PlayMode play_mode) override final;
     Status Pause() override final;
+    Status Resume() override final;
     Status Stop() override final;
     Status SetVolume(uint16_t volume) override final;
+    Status GetStatusOk() override final;
 
 private:
+    Status ConvertPlayModeToStatus(PlayMode play_mode);
 
+    PlayMode play_mode_m;
+    std::string play_file_name_m;
 };
 
 } // namespace mp3server

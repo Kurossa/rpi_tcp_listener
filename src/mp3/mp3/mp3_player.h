@@ -27,8 +27,9 @@ namespace mp3server
 
 class Mp3Player
 {
-    friend class PlayerStopState;
     friend class PlayerPlayState;
+    friend class PlayerPauseState;
+    friend class PlayerStopState;
 
 public:
     Mp3Player():
@@ -40,23 +41,25 @@ public:
         ao_driver_id_m(0),
         ao_dev_m(0),
         volume_m(100),
-        state_m(new PlayerStopState(*this)),
-        play_thread_stop_m(false) {}
+        play_thread_stop_m(false)
+    {
+        state_m.reset(new PlayerStopState(*this));
+    }
     ~Mp3Player() { Stop(); }
 
     void SetState(PlayerState* new_state);
-    Status Play(std::string file_name);
+    Status Play(std::string file_name, PlayMode play_mode);
     Status Pause();
     Status Stop();
     Status SetVolume(uint16_t volume);
 
-    void RunPlayThread(std::string& file_name);
+    void InitPlayer(void);
+    void ResetPlayer(void);
+    void RunPlayThread(std::string& file_name, PlayMode play_mode);
     void StopPlayThread();
 
 private:
-    void DoPlay(std::string file_name);
-    void InitPlayer(void);
-    void ResetPlayer(void);
+    void DoPlay(std::string file_name, PlayMode play_mode);
 
     // mpg123 and ao variables
     mpg123_handle *mh_m;

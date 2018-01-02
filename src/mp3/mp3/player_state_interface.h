@@ -23,10 +23,12 @@ public:
         mp3_player_m(mp3_player) {}
     virtual ~PlayerState() {}
 
-    virtual Status Play(std::string file_name) = 0;
+    virtual Status Play(std::string file_name, PlayMode play_mode) = 0;
     virtual Status Pause() = 0;
+    virtual Status Resume() = 0;
     virtual Status Stop() = 0;
     virtual Status SetVolume(uint16_t volume) = 0;
+    virtual Status GetStatusOk() = 0;
 
     virtual void OnEnter() {} // Method used on entering new state during switch
     virtual void OnLeave() {} // Method used on leaving new state during switch

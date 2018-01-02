@@ -25,9 +25,10 @@ enum Action {
     ACTION_MAX
 };
 
-enum Play {
+enum PlayMode {
     ONCE = 0,
     IN_LOOP,
+    PAUSED,
     PLAY_MAX
 };
 

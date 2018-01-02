@@ -13,6 +13,8 @@ add_library (mp3
     mp3/player_state_interface.h
     mp3/player_play_state.cpp
     mp3/player_play_state.h
+    mp3/player_pause_state.cpp
+    mp3/player_pause_state.h
     mp3/player_stop_state.cpp
     mp3/player_stop_state.h
 )
