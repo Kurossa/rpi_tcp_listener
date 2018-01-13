@@ -23,8 +23,8 @@ PlayerPauseState::PlayerPauseState(Mp3Player& mp3_player, std::string& file_name
 Status PlayerPauseState::Play(std::string file_name, PlayMode play_mode)
 {
     printf("Pause state, stop prev play and play new file: %s\n", file_name.c_str());
-    mp3_player_m.ResetPlayer();
-    mp3_player_m.InitPlayer();
+    mp3_player_m.ClosePlayer();
+    mp3_player_m.OpenPlayer(file_name);
     mp3_player_m.SetState(new PlayerPlayState(mp3_player_m, file_name, play_mode));
     //TODO: Return proper code after changing the state.
     return GetStatusOk();
@@ -54,7 +54,7 @@ Status PlayerPauseState::Stop()
 
 Status PlayerPauseState::SetVolume(uint16_t volume)
 {
-    printf("Pause state, Set volume: %d", volume);
+    printf("Pause state, Set volume: %d\n", volume);
     if (volume <=100) {
         mp3_player_m.volume_m = volume;
         float volume_float = volume / 100.0;

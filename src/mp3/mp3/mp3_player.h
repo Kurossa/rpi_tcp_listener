@@ -32,43 +32,36 @@ class Mp3Player
     friend class PlayerStopState;
 
 public:
-    Mp3Player():
-        mh_m(0),
-        buffer_mpg_m(0),
-        buffer_mpg_size_m(0),
-        buffer_mpg_done_m(0),
-        err_m(0),
-        ao_driver_id_m(0),
-        ao_dev_m(0),
-        volume_m(100),
-        play_thread_stop_m(false)
-    {
-        state_m.reset(new PlayerStopState(*this));
-    }
-    ~Mp3Player() { Stop(); }
+    Mp3Player();
+    ~Mp3Player();
 
-    void SetState(PlayerState* new_state);
     Status Play(std::string file_name, PlayMode play_mode);
     Status Pause();
+    Status Resume();
     Status Stop();
     Status SetVolume(uint16_t volume);
 
-    void InitPlayer(void);
-    void ResetPlayer(void);
+private:
+    void DoStop();
+    void SetState(PlayerState* new_state);
+
+    bool OpenPlayer(std::string& file_name);
+    void ClosePlayer(void);
     void RunPlayThread(std::string& file_name, PlayMode play_mode);
     void StopPlayThread();
-
-private:
     void DoPlay(std::string file_name, PlayMode play_mode);
 
-    // mpg123 and ao variables
+    // mpg123 variables
     mpg123_handle *mh_m;
     unsigned char *buffer_mpg_m;
     size_t buffer_mpg_size_m;
     size_t buffer_mpg_done_m;
-    int err_m;
+
+    // ao_driver variables
     int ao_driver_id_m;
     ao_device *ao_dev_m;
+    //FIXME: Check if needed?
+    int err_m;
 
     // Volume value
     uint32_t volume_m;
@@ -78,9 +71,18 @@ private:
     std::unique_ptr<PlayerState> state_m;
 
     // Player play thread
-    std::mutex play_thread_mutex_m;
-    bool play_thread_stop_m;
+    std::mutex stop_thread_mutex_m;
+    bool stop_thread_m;
+    std::mutex thread_mutex_m;
     std::thread play_thread_m;
+    bool thread_is_running_m;
+
+    bool cv_ready_m;
+    std::mutex cv_mutex_m;
+    std::condition_variable cv_m;
+    std::thread::id thread_id_to_stop_m;
+
+    std::thread auto_stop_thread_m;
 };
 
 } // namespace mp3server

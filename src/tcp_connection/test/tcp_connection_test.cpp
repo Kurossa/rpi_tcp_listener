@@ -15,7 +15,7 @@ class TcpConnection : public ::testing::Test
 public:
     virtual void SetUp()
     {
-        m_ready = false;
+        ready_m = false;
     }
 
      virtual void TearDown()
@@ -34,15 +34,14 @@ public:
                            , int port);
 
 private:
-    bool m_ready = false;
-    std::mutex m_mu;
-    std::condition_variable m_cv;
+    bool ready_m = false;
+    std::mutex mu_m;
+    std::condition_variable cv_m;
 
 };
 
 void TcpConnection::ServerThread(int port, std::promise<std::string> && pr)
 {
-    std::lock_guard<std::mutex> lock(m_mu);
     char rcv_from_client[tcp::BUFFER_SIZE] = {0};
     int sent = 0, received = 0;
 
@@ -50,9 +49,11 @@ void TcpConnection::ServerThread(int port, std::promise<std::string> && pr)
     tcp_server.Connect();
 
     // Communicate client that server is ready.
-    m_ready = true;
-    m_cv.notify_one();
-    m_mu.unlock();
+    {
+        std::lock_guard<std::mutex> lock(mu_m);
+        ready_m = true;
+    }
+    cv_m.notify_one();
 
     tcp_server.Receive(rcv_from_client, tcp::BUFFER_SIZE, received);
     tcp_server.Send(rcv_from_client, tcp::BUFFER_SIZE, sent);
@@ -67,9 +68,9 @@ void TcpConnection::ClientThread(  std::string test_string
                                  , std::promise<std::string> && pr)
 {
     // Wait for server thread to start listening.
-    std::unique_lock<std::mutex> lock(m_mu);
-    while (!m_ready) m_cv.wait(lock);
-    m_ready = false; // Clear ready state to be able to repeat test
+    std::unique_lock<std::mutex> lock(mu_m);
+    while (!ready_m) cv_m.wait(lock);
+    ready_m = false; // Clear ready state to be able to repeat test
 
     char rcv_from_server[tcp::BUFFER_SIZE] = {0};
     int sent = 0, received = 0;
@@ -116,7 +117,7 @@ TEST_F (TcpConnection, SendReceiveThread) {
 
 std::string TcpConnection::ServerTask(int port)
 {
-    std::lock_guard<std::mutex> lock(m_mu);
+
     char rcv_from_client[tcp::BUFFER_SIZE] = {0};
     int sent = 0, received = 0;
 
@@ -124,9 +125,11 @@ std::string TcpConnection::ServerTask(int port)
     tcp_server.Connect();
 
     // Communicate client that server is ready.
-    m_ready = true;
-    m_cv.notify_one();
-    m_mu.unlock();
+    {
+        std::lock_guard<std::mutex> lock(mu_m);
+        ready_m = true;
+    }
+    cv_m.notify_one();
 
     tcp_server.Receive(rcv_from_client, tcp::BUFFER_SIZE, received);
     tcp_server.Send(rcv_from_client, tcp::BUFFER_SIZE, sent);
@@ -140,9 +143,9 @@ std::string TcpConnection::ClientTask(  std::string test_string
                                       , int port)
 {
     // Wait for server thread to start listening.
-    std::unique_lock<std::mutex> lock(m_mu);
-    while (!m_ready) m_cv.wait(lock);
-    m_ready = false; // Clear ready state to be able to repeat test
+    std::unique_lock<std::mutex> lock(mu_m);
+    while (!ready_m) cv_m.wait(lock);
+    ready_m = false; // Clear ready state to be able to repeat test
 
     char rcv_from_server[tcp::BUFFER_SIZE] = {0};
     int sent = 0, received = 0;
