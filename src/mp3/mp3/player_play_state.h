@@ -16,6 +16,7 @@ namespace mp3server
 class PlayerPlayState : public PlayerState
 {
 public:
+    //play_mode set to other than IN_LOOP will be converted to ONCE
     PlayerPlayState(Mp3Player& mp3_player, std::string& file_name, PlayMode play_mode);
     ~PlayerPlayState() {}
     Status Play(std::string file_name, PlayMode play_mode) override final;
@@ -23,7 +24,8 @@ public:
     Status Resume() override final;
     Status Stop() override final;
     Status SetVolume(uint16_t volume) override final;
-    Status GetStatusOk() override final;
+    PlayMode GetPlayMode() override final { return play_mode_m; }
+    std::string GetPlayModeStr() override final { return std::string(PLAY_MODE_STR[play_mode_m]); }
 
 private:
     Status ConvertPlayModeToStatus(PlayMode play_mode);

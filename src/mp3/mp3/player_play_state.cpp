@@ -14,45 +14,58 @@ using namespace mp3server;
 
 PlayerPlayState::PlayerPlayState(Mp3Player& mp3_player, std::string& file_name, PlayMode play_mode):
     PlayerState(mp3_player),
-    play_mode_m(play_mode),
     play_file_name_m(file_name)
 {
+    switch(play_mode)
+    {
+    case PlayMode::IN_LOOP:
+        play_mode_m = PlayMode::IN_LOOP;
+        break;
+    default:
+        play_mode = PlayMode::ONCE;
+        break;
+    }
     mp3_player.RunPlayThread(file_name, play_mode);
 }
 
 Status PlayerPlayState::Play(std::string file_name, PlayMode play_mode)
 {
     printf("Play state, stop prev play and play new file: %s\n", file_name.c_str());
-    play_mode_m = play_mode;
+    switch(play_mode)
+    {
+    case PlayMode::IN_LOOP:
+        play_mode_m = PlayMode::IN_LOOP;
+        break;
+    default:
+        play_mode = PlayMode::ONCE;
+        break;
+    }
     play_file_name_m = file_name;
     mp3_player_m.StopPlayThread();
     mp3_player_m.ClosePlayer();
     mp3_player_m.OpenPlayer(file_name);
     mp3_player_m.RunPlayThread(file_name, play_mode);
-    play_mode_m = play_mode;
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerPlayState::Pause()
 {
     printf("Play state, changing to Pause state\n");
     mp3_player_m.SetState(new PlayerPauseState(mp3_player_m, play_file_name_m, play_mode_m));
-    //TODO: Return proper code after changing the state.
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerPlayState::Resume()
 {
     printf("Play state, already playing, nothing to resume\n");
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerPlayState::Stop()
 {
     printf("Play state, changing to Stop state\n");
     mp3_player_m.SetState(new PlayerStopState(mp3_player_m));
-    //TODO: Return proper code after changing the state.
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerPlayState::SetVolume(uint16_t volume)
@@ -62,25 +75,8 @@ Status PlayerPlayState::SetVolume(uint16_t volume)
         mp3_player_m.volume_m = volume;
         float volume_float = volume / 100.0;
         mpg123_volume(mp3_player_m.mh_m, volume_float);
-        return GetStatusOk();
+        return Status::SUCCESS;
     }
     return Status::FAILED;
 }
 
-Status PlayerPlayState::GetStatusOk()
-{
-    return ConvertPlayModeToStatus(play_mode_m);
-}
-
-Status PlayerPlayState::ConvertPlayModeToStatus(mp3server::PlayMode play_mode)
-{
-    switch (play_mode)
-    {
-    case PlayMode::ONCE:
-        return Status::PLAY_ONCE;
-    case PlayMode::IN_LOOP:
-        return Status::PLAY_IN_LOOP;
-    default:
-        return Status::FAILED;
-    }
-}

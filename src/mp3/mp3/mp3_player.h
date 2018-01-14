@@ -40,9 +40,10 @@ public:
     Status Resume();
     Status Stop();
     Status SetVolume(uint16_t volume);
+    PlayMode GetPlayMode();
+    std::string GetPlayModeStr();
 
 private:
-    void DoStop();
     void SetState(PlayerState* new_state);
 
     bool OpenPlayer(std::string& file_name);
@@ -50,6 +51,7 @@ private:
     void RunPlayThread(std::string& file_name, PlayMode play_mode);
     void StopPlayThread();
     void DoPlay(std::string file_name, PlayMode play_mode);
+    void DoStop();
 
     // mpg123 variables
     mpg123_handle *mh_m;

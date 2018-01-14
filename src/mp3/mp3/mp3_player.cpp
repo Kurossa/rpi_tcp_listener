@@ -73,30 +73,22 @@ Status Mp3Player::Stop()
     return state_m->Stop();
 }
 
-void Mp3Player::DoStop()
-{
-    std::unique_lock<std::mutex> lock_cv(cv_mutex_m);
-    while (!cv_ready_m) cv_m.wait(lock_cv);
-    cv_ready_m = false;
-
-    lock_guard<mutex> lock(state_mutex_m);
-    std::thread::id current_thread_id;
-    {
-        lock_guard<std::mutex> lock_thread(thread_mutex_m);
-        current_thread_id = play_thread_m.get_id();
-    }
-    if (thread_id_to_stop_m != std::thread::id()
-        && thread_id_to_stop_m == current_thread_id)
-    {
-        state_m->Stop();
-        thread_id_to_stop_m = std::thread::id();
-    }
-}
-
 Status Mp3Player::SetVolume(uint16_t volume)
 {
     lock_guard<mutex> lock(state_mutex_m);
     return state_m->SetVolume(volume);
+}
+
+PlayMode Mp3Player::GetPlayMode()
+{
+    lock_guard<mutex> lock(state_mutex_m);
+    return state_m->GetPlayMode();
+}
+
+std::string Mp3Player::GetPlayModeStr()
+{
+    lock_guard<mutex> lock(state_mutex_m);
+    return state_m->GetPlayModeStr();
 }
 
 void Mp3Player::SetState(PlayerState* new_state)
@@ -247,6 +239,26 @@ void Mp3Player::DoPlay(std::string file_name, PlayMode play_mode)
         thread_id_to_stop_m = std::this_thread::get_id();
         cv_ready_m = true;
         cv_m.notify_one();
+    }
+}
+
+void Mp3Player::DoStop()
+{
+    std::unique_lock<std::mutex> lock_cv(cv_mutex_m);
+    while (!cv_ready_m) cv_m.wait(lock_cv);
+    cv_ready_m = false;
+
+    lock_guard<mutex> lock(state_mutex_m);
+    std::thread::id current_thread_id;
+    {
+        lock_guard<std::mutex> lock_thread(thread_mutex_m);
+        current_thread_id = play_thread_m.get_id();
+    }
+    if (thread_id_to_stop_m != std::thread::id()
+        && thread_id_to_stop_m == current_thread_id)
+    {
+        state_m->Stop();
+        thread_id_to_stop_m = std::thread::id();
     }
 }
 

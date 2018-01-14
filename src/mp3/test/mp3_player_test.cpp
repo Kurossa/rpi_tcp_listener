@@ -24,7 +24,7 @@ TEST (Mp3PlayerTest, DISABLED_PlayStopState) {
 TEST (Mp3PlayerTest, PlayPausePlayStopState) {
 
     mp3server::Mp3Player mp3_player;
-    mp3_player.Play("test1.mp3", mp3server::PlayMode::ONCE);
+    mp3_player.Play("test.mp3", mp3server::PlayMode::ONCE);
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     mp3_player.Pause();
     mp3_player.SetVolume(50);

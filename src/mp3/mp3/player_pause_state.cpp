@@ -26,30 +26,27 @@ Status PlayerPauseState::Play(std::string file_name, PlayMode play_mode)
     mp3_player_m.ClosePlayer();
     mp3_player_m.OpenPlayer(file_name);
     mp3_player_m.SetState(new PlayerPlayState(mp3_player_m, file_name, play_mode));
-    //TODO: Return proper code after changing the state.
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerPauseState::Pause()
 {
     printf("Pause state, already paused\n");
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerPauseState::Resume()
 {
     printf("Pause state, changing to Play state\n");
     mp3_player_m.SetState(new PlayerPlayState(mp3_player_m, play_file_name_m, play_mode_m));
-    //TODO: Return proper code after changing the state.
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerPauseState::Stop()
 {
     printf("Pause state, changing to Stop state\n");
     mp3_player_m.SetState(new PlayerStopState(mp3_player_m));
-    //TODO: Return proper code after changing the state.
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerPauseState::SetVolume(uint16_t volume)
@@ -59,7 +56,7 @@ Status PlayerPauseState::SetVolume(uint16_t volume)
         mp3_player_m.volume_m = volume;
         float volume_float = volume / 100.0;
         mpg123_volume(mp3_player_m.mh_m, volume_float);
-        return GetStatusOk();
+        return Status::SUCCESS;
     }
     return Status::FAILED;
 }

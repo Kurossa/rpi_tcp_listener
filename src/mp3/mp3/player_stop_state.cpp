@@ -23,27 +23,25 @@ Status PlayerStopState::Play(std::string file_name, PlayMode play_mode)
     printf("Stop state, play file: %s\n", file_name.c_str());
     mp3_player_m.OpenPlayer(file_name);
     mp3_player_m.SetState(new PlayerPlayState(mp3_player_m, file_name, play_mode));
-    //TODO: Return proper code after changing the state.
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerStopState::Pause()
 {
     printf("Stop state, nothing to pause\n");
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerStopState::Resume()
 {
     printf("Stop state, nothing to resume\n");
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerStopState::Stop()
 {
     printf("Stop state, already stopped\n");
-
-    return GetStatusOk();
+    return Status::SUCCESS;
 }
 
 Status PlayerStopState::SetVolume(uint16_t volume)
@@ -51,7 +49,7 @@ Status PlayerStopState::SetVolume(uint16_t volume)
     printf("Stop state, Set volume: %d\n", volume);
     if (volume <=100) {
         mp3_player_m.volume_m = volume;
-        return GetStatusOk();
+        return Status::SUCCESS;;
     }
     return Status::FAILED;
 }
