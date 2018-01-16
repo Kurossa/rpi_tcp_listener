@@ -12,34 +12,34 @@
 
 using namespace mp3server;
 
-PlayerPlayState::PlayerPlayState(Mp3Player& mp3_player, std::string& file_name, PlayMode play_mode):
-    PlayerState(mp3_player),
-    play_file_name_m(file_name)
+namespace
+{
+
+State PlayModeToState(PlayMode play_mode)
 {
     switch(play_mode)
     {
     case PlayMode::IN_LOOP:
-        play_mode_m = PlayMode::IN_LOOP;
-        break;
+        return State::PLAY_IN_LOOP;
     default:
-        play_mode = PlayMode::ONCE;
-        break;
+        return State::PLAY_ONCE;
     }
+}
+
+}
+
+PlayerPlayState::PlayerPlayState(Mp3Player& mp3_player, std::string& file_name, PlayMode play_mode):
+    PlayerState(mp3_player),
+    play_mode_m(play_mode),
+    play_file_name_m(file_name)
+{
     mp3_player.RunPlayThread(file_name, play_mode);
 }
 
 Status PlayerPlayState::Play(std::string file_name, PlayMode play_mode)
 {
     printf("Play state, stop prev play and play new file: %s\n", file_name.c_str());
-    switch(play_mode)
-    {
-    case PlayMode::IN_LOOP:
-        play_mode_m = PlayMode::IN_LOOP;
-        break;
-    default:
-        play_mode = PlayMode::ONCE;
-        break;
-    }
+    play_mode_m = play_mode;
     play_file_name_m = file_name;
     mp3_player_m.StopPlayThread();
     mp3_player_m.ClosePlayer();
@@ -78,5 +78,15 @@ Status PlayerPlayState::SetVolume(uint16_t volume)
         return Status::SUCCESS;
     }
     return Status::FAILED;
+}
+
+State PlayerPlayState::GetState()
+{
+    return PlayModeToState(play_mode_m);
+}
+
+std::string PlayerPlayState::GetStateStr()
+{
+    return std::string(STATE_STR[PlayModeToState(play_mode_m)]);
 }
 

@@ -28,8 +28,8 @@ public:
     virtual Status Resume() = 0;
     virtual Status Stop() = 0;
     virtual Status SetVolume(uint16_t volume) = 0;
-    virtual PlayMode GetPlayMode() = 0;
-    virtual std::string GetPlayModeStr() = 0;
+    virtual State GetState() = 0;
+    virtual std::string GetStateStr() = 0;
 
     virtual Status OnEnter() { return Status::SUCCESS; } // Method used on entering new state during switch
     virtual Status OnLeave() { return Status::SUCCESS; } // Method used on leaving new state during switch

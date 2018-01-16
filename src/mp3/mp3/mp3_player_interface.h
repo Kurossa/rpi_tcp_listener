@@ -26,11 +26,17 @@ enum Action {
 };
 
 enum PlayMode {
-    STOPED = 0,
-    ONCE,
+    ONCE = 0,
     IN_LOOP,
-    PAUSED,
     PLAY_MODE_MAX
+};
+
+enum State {
+    STOPED = 0,
+    PLAY_ONCE,
+    PLAY_IN_LOOP,
+    PAUSED,
+    STATE_MAX
 };
 
 enum Status {
@@ -40,11 +46,11 @@ enum Status {
     STATUS_MAX
 };
 
-const char PLAY_MODE_STR[PLAY_MODE_MAX][64] = { "AUDIO_IDLE",
-                                                "AUDIO_PLAY_ONCE",
-                                                "AUDIO_PLAY_IN_LOOP",
-                                                "AUDIO_PLAY_PAUSED"
-                                                "AUDIO_FAILED" };
+const char STATE_STR[STATE_MAX][64] = { "AUDIO_IDLE",
+                                         "AUDIO_PLAY_ONCE",
+                                         "AUDIO_PLAY_IN_LOOP",
+                                         "AUDIO_PLAY_PAUSED"
+                                         "AUDIO_FAILED" };
 
 struct Message
 {

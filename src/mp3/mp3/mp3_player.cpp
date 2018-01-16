@@ -79,16 +79,16 @@ Status Mp3Player::SetVolume(uint16_t volume)
     return state_m->SetVolume(volume);
 }
 
-PlayMode Mp3Player::GetPlayMode()
+State Mp3Player::GetPlayMode()
 {
     lock_guard<mutex> lock(state_mutex_m);
-    return state_m->GetPlayMode();
+    return state_m->GetState();
 }
 
 std::string Mp3Player::GetPlayModeStr()
 {
     lock_guard<mutex> lock(state_mutex_m);
-    return state_m->GetPlayModeStr();
+    return state_m->GetStateStr();
 }
 
 void Mp3Player::SetState(PlayerState* new_state)

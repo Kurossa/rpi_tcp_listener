@@ -40,7 +40,7 @@ public:
     Status Resume();
     Status Stop();
     Status SetVolume(uint16_t volume);
-    PlayMode GetPlayMode();
+    State GetPlayMode();
     std::string GetPlayModeStr();
 
 private:

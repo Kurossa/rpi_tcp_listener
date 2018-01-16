@@ -23,8 +23,8 @@ public:
     Status Resume() override final;
     Status Stop() override final;
     Status SetVolume(uint16_t volume) override final;
-    PlayMode GetPlayMode() override final { return PlayMode::STOPED; }
-    std::string GetPlayModeStr() override final { return std::string(PLAY_MODE_STR[PlayMode::STOPED]); }
+    State GetState() override final { return State::STOPED; }
+    std::string GetStateStr() override final { return std::string(STATE_STR[State::STOPED]); }
 private:
 
 };
