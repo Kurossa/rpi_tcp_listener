@@ -6,6 +6,7 @@
  */
 
 #include "mp3_player.h"
+#include "player_stop_state.h"
 #include <utilities/logger.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -26,11 +27,11 @@ Mp3Player::Mp3Player():
     buffer_mpg_done_m(0),
     ao_driver_id_m(0),
     ao_dev_m(0),
-    err_m(0),
     volume_m(100),
     stop_thread_m(false),
     thread_is_running_m(false),
     cv_ready_m(false),
+    stop_auto_stop_thread_m(false),
     thread_id_to_stop_m(std::thread::id())
 
 {
@@ -44,6 +45,7 @@ Mp3Player::~Mp3Player()
         std::lock_guard<std::mutex> lock(cv_mutex_m);
         thread_id_to_stop_m = std::thread::id();
         cv_ready_m = true;
+        stop_auto_stop_thread_m = true;
     }
     cv_m.notify_one();
     auto_stop_thread_m.join();
@@ -102,8 +104,9 @@ void Mp3Player::SetState(PlayerState* new_state)
 bool Mp3Player::OpenPlayer(std::string& file_name)
 {
     // Initialize mpg123
+    int error = 0;
     mpg123_init();
-    mh_m = mpg123_new(NULL, &err_m);
+    mh_m = mpg123_new(NULL, &error);
     //buffer_mpg_size_m = mpg123_outblock(mh_m);
     buffer_mpg_size_m = MP3_SAMPLE_SIZE;
     buffer_mpg_m = (unsigned char*) malloc(buffer_mpg_size_m * sizeof(unsigned char));
@@ -153,8 +156,6 @@ void Mp3Player::ClosePlayer()
     ao_shutdown();
     ao_dev_m = 0;
     ao_driver_id_m = 0;
-    //FIXME: Check if needed?
-    err_m = 0;
 }
 
 void Mp3Player::RunPlayThread(std::string& file_name, PlayMode play_mode)
@@ -166,7 +167,6 @@ void Mp3Player::RunPlayThread(std::string& file_name, PlayMode play_mode)
             lock_guard<mutex> lock(stop_thread_mutex_m);
             stop_thread_m = false;
         }
-        //InitPlayer();
         play_thread_m = std::thread(&Mp3Player::DoPlay, this, file_name, play_mode);
         thread_is_running_m = true;
     }
@@ -185,7 +185,6 @@ void Mp3Player::StopPlayThread()
             play_thread_m.join();
             thread_is_running_m = false;
         }
-        //ResetPlayer();
     }
 }
 
@@ -225,9 +224,10 @@ void Mp3Player::DoPlay(std::string file_name, PlayMode play_mode)
         }
         n = 0;
 
-        if(!stop_loop)
+        ++file_played_n_times;
+        // Check if this is last time file played, if yes, do not reopen player.
+        if(!stop_loop && file_played_n_times < file_play_max_times)
         {
-            ++file_played_n_times;
             ClosePlayer();
             OpenPlayer(file_name);
         }
@@ -244,21 +244,25 @@ void Mp3Player::DoPlay(std::string file_name, PlayMode play_mode)
 
 void Mp3Player::DoStop()
 {
-    std::unique_lock<std::mutex> lock_cv(cv_mutex_m);
-    while (!cv_ready_m) cv_m.wait(lock_cv);
-    cv_ready_m = false;
+    do
+    {
+        std::unique_lock<std::mutex> lock_cv(cv_mutex_m);
+        while (!cv_ready_m) cv_m.wait(lock_cv);
+        cv_ready_m = false;
 
-    lock_guard<mutex> lock(state_mutex_m);
-    std::thread::id current_thread_id;
-    {
-        lock_guard<std::mutex> lock_thread(thread_mutex_m);
-        current_thread_id = play_thread_m.get_id();
-    }
-    if (thread_id_to_stop_m != std::thread::id()
-        && thread_id_to_stop_m == current_thread_id)
-    {
-        state_m->Stop();
-        thread_id_to_stop_m = std::thread::id();
-    }
+        lock_guard<mutex> lock(state_mutex_m);
+        std::thread::id current_thread_id;
+        {
+            lock_guard<std::mutex> lock_thread(thread_mutex_m);
+            current_thread_id = play_thread_m.get_id();
+        }
+
+        if (thread_id_to_stop_m != std::thread::id()
+            && thread_id_to_stop_m == current_thread_id)
+        {
+            state_m->Stop();
+            thread_id_to_stop_m = std::thread::id();
+        }
+    } while(!stop_auto_stop_thread_m);
 }
 

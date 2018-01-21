@@ -9,8 +9,7 @@
 #define MP3_PLAYER_H_
 
 #include "mp3_player_interface.h"
-#include "player_stop_state.h"
-#include "player_play_state.h"
+#include "player_state_interface.h"
 
 #include <utilities/message_queue.h>
 #include <app_config/app_constants.h>
@@ -48,8 +47,10 @@ private:
 
     bool OpenPlayer(std::string& file_name);
     void ClosePlayer(void);
+
     void RunPlayThread(std::string& file_name, PlayMode play_mode);
     void StopPlayThread();
+
     void DoPlay(std::string file_name, PlayMode play_mode);
     void DoStop();
 
@@ -62,8 +63,6 @@ private:
     // ao_driver variables
     int ao_driver_id_m;
     ao_device *ao_dev_m;
-    //FIXME: Check if needed?
-    int err_m;
 
     // Volume value
     uint32_t volume_m;
@@ -79,8 +78,9 @@ private:
     std::thread play_thread_m;
     bool thread_is_running_m;
 
-    bool cv_ready_m;
     std::mutex cv_mutex_m;
+    bool cv_ready_m;
+    bool stop_auto_stop_thread_m;
     std::condition_variable cv_m;
     std::thread::id thread_id_to_stop_m;
 

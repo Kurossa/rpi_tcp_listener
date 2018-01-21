@@ -1,9 +1,6 @@
 #include "gtest/gtest.h"
-
 #include <zip/zip.h>
 #include <utilities/logger.h>
-
-#include <cstdlib>
 
 namespace
 {

@@ -1,6 +1,8 @@
 enable_testing()
-add_subdirectory(ext/gtest-1.7.0)
-include_directories(${gtest_SOURCE_DIR}/include)
+#add_subdirectory(ext/googletest-1.7.0/gtest)
+add_subdirectory(ext/googletest-1.7.0/gmock)
+include_directories(${gtest_SOURCE_DIR}/include
+                    ${gmock_SOURCE_DIR}/include)
 
 add_subdirectory(zip/test)
 add_subdirectory(time/test)

@@ -27,43 +27,51 @@ typedef enum eMessageQueue {
 }eMessageQueue_t;
 
 template <typename T>
-class cMessageQueue {
+class MessageQueue {
 public:
-    cMessageQueue(void) {}
-    ~cMessageQueue() {}
+    MessageQueue() {}
+    ~MessageQueue() {}
 
     void enqueue(T& msg) {
         std::lock_guard<std::mutex> lock(queue_mutex);
-        msg_queue.push(msg);
-        queue_cond_var.notify_one();
+        msg_queue_m.push(msg);
+        queue_cv_m.notify_one();
     }
 
     T dequeue()
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
-        while (msg_queue.empty())
-        {
-            //TODO: add member variable as posix can break waiting (as security reason)
-            queue_cond_var.wait(lock);
-        }
-        T ret_val = msg_queue.back();
-        msg_queue.pop();
+        while (msg_queue_m.empty())
+            queue_cv_m.wait(lock); //, [&]{ return !msg_queue_m.empty(); });
+        T ret_val = msg_queue_m.front();
+        msg_queue_m.pop();
 
         return ret_val;
     }
 
+    int size(void) {
+        std::lock_guard<std::mutex> lock(queue_mutex);
+        return msg_queue_m.size();
+    }
+
+    void empty(void) {
+        std::lock_guard<std::mutex> lock(queue_mutex);
+        std::queue<T> empty;
+        std::swap( msg_queue_m, empty );
+    }
+
     void push(T& msg) {
         std::lock_guard<std::mutex> lock(queue_mutex);
-        msg_queue.push(msg);
-        queue_cond_var.notify_one();
+        msg_queue_m.push(msg);
+        queue_cv_m.notify_one();
     }
 
     eMessageQueue_t pop(T& msg) {
         int status = MQ_NUM;
         std::lock_guard<std::mutex> lock(queue_mutex);
-        if (!msg_queue.empty()) {
-            msg = msg_queue.back();
-            msg_queue.pop();
+        if (!msg_queue_m.empty()) {
+            msg = msg_queue_m.front();
+            msg_queue_m.pop();
             status = MQ_MSG_POP;
         } else {
             status = MQ_NO_MESSAGE;
@@ -74,8 +82,8 @@ public:
     eMessageQueue_t poke(T& msg) {
         int status = MQ_NUM;
         std::lock_guard<std::mutex> lock(queue_mutex);
-        if (!msg_queue.empty()) {
-            msg = msg_queue.back();
+        if (!msg_queue_m.empty()) {
+            msg = msg_queue_m.back();
             status = MQ_MSG_PENDING;
         } else {
             status = MQ_NO_MESSAGE;
@@ -109,13 +117,10 @@ public:
         return (eMessageQueue_t)status;
     }
 
-    int size(void) {
-        return msg_queue.size();
-    }
 private:
-    std::queue<T> msg_queue;
+    std::queue<T> msg_queue_m;
     std::mutex queue_mutex;
-    std::condition_variable queue_cond_var;
+    std::condition_variable queue_cv_m;
 };
 
 }

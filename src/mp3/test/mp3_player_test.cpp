@@ -24,16 +24,21 @@ TEST (Mp3PlayerTest, DISABLED_PlayStopState) {
 TEST (Mp3PlayerTest, PlayPausePlayStopState) {
 
     mp3server::Mp3Player mp3_player;
-    mp3_player.Play("test.mp3", mp3server::PlayMode::ONCE);
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    mp3_player.Play("123.mp3", mp3server::PlayMode::ONCE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     mp3_player.Pause();
-    mp3_player.SetVolume(50);
+    mp3_player.SetVolume(70);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     //FIXME: Repair Resume stat, probably DoPlay read again file.
     mp3_player.Resume();
-    std::this_thread::sleep_for(std::chrono::milliseconds(4000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     mp3_player.Stop();
+    mp3_player.Play("123.mp3", mp3server::PlayMode::ONCE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+    mp3_player.Play("123.mp3", mp3server::PlayMode::ONCE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
     printf("End of test!\n");
     EXPECT_TRUE(true);

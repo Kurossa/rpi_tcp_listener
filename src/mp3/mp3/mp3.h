@@ -60,8 +60,8 @@ struct sMp3Reply
     eErrorCode_t errorCode;
 };
 
-typedef utils::cMessageQueue<sMp3Message> mqSend_t;
-typedef utils::cMessageQueue<sMp3Reply> mqReply_t;
+typedef utils::MessageQueue<sMp3Message> mqSend_t;
+typedef utils::MessageQueue<sMp3Reply> mqReply_t;
 
 class cMp3Server : public cPthreadWrapper{
 public:
