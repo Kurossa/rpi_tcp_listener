@@ -4,7 +4,7 @@ add_executable(mp3_player_test
 
 target_link_libraries(mp3_player_test
     mp3
-    app_utilities
+    utilities
     gtest
     gtest_main)
 

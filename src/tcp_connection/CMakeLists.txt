@@ -11,5 +11,5 @@ add_library (tcp_connection
 
 target_include_directories (tcp_connection PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries (tcp_connection PRIVATE app_utilities)
+target_link_libraries (tcp_connection PRIVATE utilities)
 

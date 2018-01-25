@@ -2,11 +2,11 @@
  * app_message_queue.hpp
  *
  *  Created on: Apr 12, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
 
-#ifndef UTILITIES_MESSAGE_QUEUE_HPP_
-#define UTILITIES_MESSAGE_QUEUE_HPP_
+#ifndef UTILITIES_MESSAGE_QUEUE_H_
+#define UTILITIES_MESSAGE_QUEUE_H_
 
 #include <queue>
 #include <string>
@@ -38,11 +38,9 @@ public:
         queue_cv_m.notify_one();
     }
 
-    T dequeue()
-    {
+    T dequeue() {
         std::unique_lock<std::mutex> lock(queue_mutex);
-        while (msg_queue_m.empty())
-            queue_cv_m.wait(lock); //, [&]{ return !msg_queue_m.empty(); });
+        queue_cv_m.wait(lock, [&]{ return !msg_queue_m.empty(); });
         T ret_val = msg_queue_m.front();
         msg_queue_m.pop();
 
@@ -124,4 +122,4 @@ private:
 };
 
 }
-#endif // UTILITIES_MESSAGE_QUEUE_HPP_
+#endif // UTILITIES_MESSAGE_QUEUE_H_

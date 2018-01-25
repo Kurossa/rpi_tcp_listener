@@ -5,8 +5,8 @@
  *      Author: Kurossa
  */
 
-#ifndef PLAYER_PLAY_STATE_H_
-#define PLAYER_PLAY_STATE_H_
+#ifndef MP3_PLAYER_PLAY_STATE_H_
+#define MP3_PLAYER_PLAY_STATE_H_
 
 #include "player_state_interface.h"
 
@@ -34,4 +34,4 @@ private:
 
 } // namespace mp3server
 
-#endif // PLAYER_PLAY_STATE_H_
+#endif // MP3_PLAYER_PLAY_STATE_H_

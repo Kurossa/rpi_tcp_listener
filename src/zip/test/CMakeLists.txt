@@ -2,7 +2,7 @@ add_executable(zip_test
     zip_test.cpp)
 
 target_link_libraries(zip_test
-    app_utilities
+    utilities
     zip
     gtest
     gtest_main)

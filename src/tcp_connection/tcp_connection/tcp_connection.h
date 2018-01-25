@@ -5,8 +5,8 @@
  *      Author: Kurossa
  */
 
-#ifndef APP_TCP_CONNECTION_TCP_CONNECTION_H_
-#define APP_TCP_CONNECTION_TCP_CONNECTION_H_
+#ifndef TCP_CONNECTION_TCP_CONNECTION_H_
+#define TCP_CONNECTION_TCP_CONNECTION_H_
 
 #include <netinet/in.h>
 #include <string>
@@ -62,4 +62,4 @@ protected:
 
 } // namespace tcp
 
-#endif /* APP_TCP_CONNECTION_TCP_CONNECTION_H_ */
+#endif /* TCP_CONNECTION_TCP_CONNECTION_H_ */

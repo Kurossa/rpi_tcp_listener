@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include <time/time.h>
+#include <utilities/time.h>
 #include <utilities/logger.h>
 
 #include <cstdlib>

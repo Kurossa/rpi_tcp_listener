@@ -5,8 +5,8 @@
  *      Author: Kurossa
  */
 
-#ifndef APP_TCP_CONNECTION_TCP_SERVER_H_
-#define APP_TCP_CONNECTION_TCP_SERVER_H_
+#ifndef TCP_CONNECTION_TCP_SERVER_H_
+#define TCP_CONNECTION_TCP_SERVER_H_
 
 #include "tcp_connection.h"
 

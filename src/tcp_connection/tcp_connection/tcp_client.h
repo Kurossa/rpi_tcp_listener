@@ -5,8 +5,8 @@
  *      Author: Kurossa
  */
 
-#ifndef APP_TCP_CONNECTION_TCP_CLIENT_H_
-#define APP_TCP_CONNECTION_TCP_CLIENT_H_
+#ifndef TCP_CONNECTION_TCP_CLIENT_H_
+#define TCP_CONNECTION_TCP_CLIENT_H_
 
 #include "tcp_connection.h"
 
@@ -34,4 +34,4 @@ private:
 
 } // namespace tcp
 
-#endif /* APP_TCP_CONNECTION_TCP_CLIENT_H_ */
+#endif /* TCP_CONNECTION_TCP_CLIENT_H_ */

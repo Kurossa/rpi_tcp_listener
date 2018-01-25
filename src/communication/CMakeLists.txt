@@ -6,5 +6,8 @@ add_library (communication
 
 target_include_directories (communication PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries (communication PRIVATE app_utilities 
-	PUBLIC mp3 msg_parser config_manager time)
+target_link_libraries (communication
+    #PRIVATE utilities
+    PUBLIC mp3
+    msg_parser
+    config_manager)

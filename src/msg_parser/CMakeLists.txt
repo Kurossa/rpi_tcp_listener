@@ -7,4 +7,4 @@ add_library (msg_parser
 
 target_include_directories (msg_parser PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries (msg_parser PRIVATE app_utilities)
+target_link_libraries (msg_parser PRIVATE utilities)

@@ -3,11 +3,11 @@
  * app_thread_wrapper.hpp
  *
  *  Created on: Apr 12, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
 
-#ifndef UTILITIES_APP_THREAD_WRAPPER_HPP_
-#define UTILITIES_APP_THREAD_WRAPPER_HPP_
+#ifndef UTILITIES_THREAD_WRAPPER_H_
+#define UTILITIES_THREAD_WRAPPER_H_
 
 #include <pthread.h>
 
@@ -28,4 +28,4 @@ protected:
     }
 };
 
-#endif /* UTILITIES_APP_THREAD_WRAPPER_HPP_ */
+#endif /* UTILITIES_THREAD_WRAPPER_H_ */

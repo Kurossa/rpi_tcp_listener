@@ -7,5 +7,5 @@ add_library (zip
 
 target_include_directories (zip PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries (zip PRIVATE app_utilities)
+target_link_libraries (zip PRIVATE utilities)
 

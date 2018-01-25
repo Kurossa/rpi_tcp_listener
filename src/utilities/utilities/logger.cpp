@@ -2,22 +2,23 @@
  * app_logger.cpp
  *
  *  Created on: Feb 2, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
+
 #include "logger.h"
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
 #include <assert.h>
-#include <math.h>
-#include <pthread.h>
-#include <sys/types.h>
+//#include <math.h>
+//#include <pthread.h>
+//#include <sys/types.h>
 #include <dirent.h>
 #include <iostream>
 #include <set>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 
 using namespace utils;
 

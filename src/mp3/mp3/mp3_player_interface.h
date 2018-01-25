@@ -5,8 +5,8 @@
  *      Author: Kurossa
  */
 
-#ifndef MP3_PLAYER_INTERFACE_H_
-#define MP3_PLAYER_INTERFACE_H_
+#ifndef MP3_MP3_PLAYER_INTERFACE_H_
+#define MP3_MP3_PLAYER_INTERFACE_H_
 
 #include <stdint.h>
 #include <unistd.h>
@@ -68,4 +68,4 @@ struct Reply
 
 } // namespace mp3server
 
-#endif // MP3_PLAYER_INTERFACE_H_
+#endif // MP3_MP3_PLAYER_INTERFACE_H_

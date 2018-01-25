@@ -2,11 +2,11 @@
  * app_mp3.hpp
  *
  *  Created on: Apr 12, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
 
-#ifndef APP_MP3_APP_MP3_HPP_
-#define APP_MP3_APP_MP3_HPP_
+#ifndef MP3_MP3_H_
+#define MP3_MP3_H_
 
 #include <utilities/thread_wrapper.h>
 #include <utilities/message_queue.h>
@@ -115,4 +115,4 @@ private:
 };
 
 
-#endif /* APP_MP3_APP_MP3_HPP_ */
+#endif /* MP3_MP3_H_ */

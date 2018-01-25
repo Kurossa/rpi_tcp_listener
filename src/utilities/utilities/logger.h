@@ -2,11 +2,11 @@
  * app_logger.hpp
  *
  *  Created on: Feb 2, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
 
-#ifndef UTILITIES_LOGGER_HPP_
-#define UTILITIES_LOGGER_HPP_
+#ifndef UTILITIES_LOGGER_H_
+#define UTILITIES_LOGGER_H_
 
 #include <cstdio>
 #include <cstdint>
@@ -41,4 +41,4 @@ void logSetLogToFile(bool value);
 
 } //namespace utils
 
-#endif // UTILITIES_LOGGER_HPP_
+#endif // UTILITIES_LOGGER_H_
