@@ -6,7 +6,7 @@
  */
 
 #include <utilities/logger.h>
-#include <zip/zip.h>
+#include <utilities/zip.h>
 #include <mp3/mp3.h>
 #include <tcp_connection/tcp_server.h>
 #include <communication/communication.h>

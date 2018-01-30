@@ -121,6 +121,7 @@ static void logRemoveLogs(void) {
     struct dirent *dirp;
     if((dp  = opendir(pLogDirName_s)) == NULL) {
         printf("[ERROR]LOG_Init: Failed to read folder %s\n", pLogDirName_s);
+        return;
     }
 
     while ((dirp = readdir(dp)) != NULL) {

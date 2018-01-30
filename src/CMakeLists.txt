@@ -3,23 +3,21 @@ project(rpi_tcp_listener_project VERSION 3.0 LANGUAGES CXX)
 
 add_definitions(-g -o0 -Wall -Wextra -Werror -pedantic -std=gnu++11)
 
+add_subdirectory(app_rpi_tcp_listener)
 add_subdirectory(app_config)
-add_subdirectory(utilities)
-add_subdirectory(zip)
-add_subdirectory(msg_parser)
-add_subdirectory(tcp_connection)
+add_subdirectory(communication)
 add_subdirectory(config_manager)
 add_subdirectory(mp3)
-add_subdirectory(communication)
-add_subdirectory(rpi_tcp_listener_app)
+add_subdirectory(tcp_connection)
+add_subdirectory(utilities)
 
 # Unit tests section
 # Option -DTEST=ON to enable testing
 option(TEST "Build all tests" OFF)
 
 if (TEST)
-    message (STATUS "Unit tests enabled")
-    include (testing.cmake)
+	message (STATUS "Unit tests enabled")
+	include (testing.cmake)
 else ()
-    message (STATUS "Unit tests disabled")
+	message (STATUS "Unit tests disabled")
 endif()

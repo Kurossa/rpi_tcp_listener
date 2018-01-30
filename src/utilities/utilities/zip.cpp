@@ -41,7 +41,7 @@ eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name)
                     buf_odd_char[1] = '\0';
                     --size_read;
                 }
-                i = 0;
+
                 for (i = 0; i < (size_read >> 1); ++i) {
                     buf_reversed[2 * i] = buf_normal[(2 * i) + 1];
                     buf_reversed[(2 * i) + 1] = buf_normal[2 * i];
@@ -98,7 +98,7 @@ eZipStaus_t ZipCompress(const char* source_name, const char* destination_name) {
                     buf_odd_char[1] = '\0';
                     --size_read;
                 }
-                i = 0;
+
                 for (i = 0; i < (size_read >> 1); ++i) {
                     buf_reversed[2 * i] = buf_normal[(2 * i) + 1];
                     buf_reversed[(2 * i) + 1] = buf_normal[2 * i];

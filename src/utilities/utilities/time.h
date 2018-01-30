@@ -5,12 +5,12 @@
  *      Author: mariusz
  */
 
-#ifndef TIME_HPP_
-#define TIME_HPP_
+#ifndef UTILITIES_TIME_H_
+#define UTILITIES_TIME_H_
 
 #include <string>
 
-namespace LinuxTime
+namespace utils
 {
 
 typedef enum eTimeStatus {
@@ -28,4 +28,4 @@ eTimeStatus_t SetTime(const std::string& time_string);
 
 } //namespace LinuxTime
 
-#endif // TIME_HPP_
+#endif // UTILITIES_TIME_H_

@@ -2,10 +2,10 @@
  * zip.hpp
  *
  *  Created on: Apr 17, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
-#ifndef APP_ZIP_HPP
-#define APP_ZIP_HPP
+#ifndef UTILITIES_ZIP_H_
+#define UTILITIES_ZIP_H_
 
 #define FILE_BLOCK (1024)
 typedef enum eZipStatus {
@@ -20,4 +20,4 @@ typedef enum eZipStatus {
 eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name);
 eZipStaus_t ZipCompress(const char* source_name, const char* destination_name);
 
-#endif
+#endif // UTILITIES_ZIP_H_

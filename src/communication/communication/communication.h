@@ -2,17 +2,17 @@
  * app_communication.hpp
  *
  *  Created on: Apr 25, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
+#include "msg_parser.h"
 #include <mp3/mp3.h>
-#include <msg_parser/msg_parser.h>
 #include <config_manager/config_manager.h>
 #include <utilities/time.h>
 
 #include <string>
 
-#ifndef APP_COMMUNICATION_APP_COMMUNICATION_HPP_
-#define APP_COMMUNICATION_APP_COMMUNICATION_HPP_
+#ifndef COMMUNICATION_COMMUNICATION_H_
+#define COMMUNICATION_COMMUNICATION_H_
 
 class cCommunication {
 public:
@@ -45,4 +45,4 @@ private:
 
 };
 
-#endif /* APP_COMMUNICATION_APP_COMMUNICATION_HPP_ */
+#endif // COMMUNICATION_COMMUNICATION_H_

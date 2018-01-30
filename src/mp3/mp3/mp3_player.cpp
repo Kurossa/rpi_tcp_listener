@@ -21,12 +21,12 @@ using std::lock_guard;
 using namespace mp3server;
 
 Mp3Player::Mp3Player():
-    mh_m(0),
+    mh_m(nullptr),
     buffer_mpg_m(0),
     buffer_mpg_size_m(0),
     buffer_mpg_done_m(0),
     ao_driver_id_m(0),
-    ao_dev_m(0),
+    ao_dev_m(nullptr),
     volume_m(100),
     stop_thread_m(false),
     thread_is_running_m(false),
@@ -112,8 +112,8 @@ bool Mp3Player::OpenPlayer(std::string& file_name)
     buffer_mpg_m = (unsigned char*) malloc(buffer_mpg_size_m * sizeof(unsigned char));
 
     // Init mp3 file
-    int channels, encoding;
-    long rate;
+    int channels = 0, encoding = 0;
+    long rate = 0;
 
     //TODO: Add chcecking if file exists or can be open by mpg123
     int status = mpg123_open(mh_m, file_name.c_str());
@@ -121,6 +121,8 @@ bool Mp3Player::OpenPlayer(std::string& file_name)
     mpg123_getformat(mh_m, &rate, &channels, &encoding);
 
     // Initialize ao_driver
+    printf("ao_initialize (count: %d)\n",ao_count_m);
+    ao_count_m++;
     ao_initialize();
     ao_driver_id_m = ao_default_driver_id();
     // Set the output format
@@ -150,11 +152,11 @@ void Mp3Player::ClosePlayer()
     buffer_mpg_m = 0;
     buffer_mpg_size_m = 0;
     buffer_mpg_done_m = 0;
-    mh_m = 0;
+    mh_m = nullptr;
 
     ao_close(ao_dev_m);
     ao_shutdown();
-    ao_dev_m = 0;
+    ao_dev_m = nullptr;
     ao_driver_id_m = 0;
 }
 

@@ -15,7 +15,7 @@ using namespace utils;
 void cCommunication::handleCommand(char* cmdMsg, char* replyMsg) {
     //printf("Received: %s", cmdMsg);
     msgParser_m.parseMsg(cmdMsg, strlen(cmdMsg));
-    LinuxTime::GetTime(time_str_m);
+    utils::GetTime(time_str_m);
     command_m = msgParser_m.getMsgCommand();
     logPrintf(LogLevel::SCREEN, "Received %d command\n", command_m);
 
@@ -53,10 +53,10 @@ void cCommunication::handleCommand(char* cmdMsg, char* replyMsg) {
 
 void cCommunication::handleSetTime(char* replyMsg) {
     eErrorCode_t error_code = ERROR_CODE_SET_TIME_ERROR;
-    if (LinuxTime::TIME_SET_OK == LinuxTime::SetTime(msgParser_m.getMsgNNodeStr(1))) {
+    if (utils::TIME_SET_OK == utils::SetTime(msgParser_m.getMsgNNodeStr(1))) {
         error_code = ERROR_CODE_OK;
     }
-    LinuxTime::GetTime(time_str_m);
+    utils::GetTime(time_str_m);
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), error_code);
 }
 

@@ -85,6 +85,8 @@ private:
     std::thread::id thread_id_to_stop_m;
 
     std::thread auto_stop_thread_m;
+
+    int ao_count_m = 0;
 };
 
 } // namespace mp3server

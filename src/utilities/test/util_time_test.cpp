@@ -40,7 +40,7 @@ bool IsCorrectTimeFormat(const std::string& time)
 
 TEST (TimeTest, GetTimeTest) {
     std::string time;
-    EXPECT_EQ(LinuxTime::TIME_GET_OK, LinuxTime::GetTime(time));
+    EXPECT_EQ(utils::TIME_GET_OK, utils::GetTime(time));
     // Date/Time format: HH:MM:SS_DD.MM.YYYY i.e. 00:00:00_01.01.2016
     EXPECT_TRUE(IsCorrectTimeFormat(time));
 }
@@ -48,33 +48,33 @@ TEST (TimeTest, GetTimeTest) {
 TEST (TimeTest, SetTimeWrongStringTest)
 {
     // Date/Time format: HH:MM:SS_DD.MM.YYYY i.e. 00:00:00_01.01.2016
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11.22:33_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22.33_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33.11-22-3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("1:22:33_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("111:22:33_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:2:33_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:222:33_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:3_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:333_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33_1.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33_111.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33_11.2.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33_11.222.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33_11.22.333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33_11.22.33333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("aa:22:33_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:aa:33_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:aa_11.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33_aa.22.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33_11.aa.3333")));
-    EXPECT_EQ(LinuxTime::TIME_WRONG_FORMAT, LinuxTime::SetTime(std::string("11:22:33_11.22.aaaa")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11.22:33_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22.33_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33.11-22-3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("1:22:33_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("111:22:33_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:2:33_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:222:33_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:3_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:333_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33_1.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33_111.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33_11.2.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33_11.222.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33_11.22.333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33_11.22.33333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("aa:22:33_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:aa:33_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:aa_11.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33_aa.22.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33_11.aa.3333")));
+    EXPECT_EQ(utils::TIME_WRONG_FORMAT, utils::SetTime(std::string("11:22:33_11.22.aaaa")));
 }
 
 TEST (TimeTest, GetSetTimeTest)
 {
     std::string time;
-    EXPECT_EQ(LinuxTime::TIME_GET_OK, LinuxTime::GetTime(time));
-    EXPECT_EQ(LinuxTime::TIME_SET_OK, LinuxTime::SetTime(time));
+    EXPECT_EQ(utils::TIME_GET_OK, utils::GetTime(time));
+    EXPECT_EQ(utils::TIME_SET_OK, utils::SetTime(time));
 }
 

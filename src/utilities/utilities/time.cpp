@@ -45,9 +45,9 @@ bool IsCorrectTimeFormat(const std::string& time)
 
 }
 
-using namespace LinuxTime;
+using namespace utils;
 
-eTimeStatus_t LinuxTime::GetTime(std::string& time_string) {
+eTimeStatus_t utils::GetTime(std::string& time_string) {
     time_t mytime = time(0);
     struct tm* tm_ptr = localtime(&mytime);
 
@@ -61,7 +61,7 @@ eTimeStatus_t LinuxTime::GetTime(std::string& time_string) {
     return TIME_NOK;
 }
 
-eTimeStatus_t LinuxTime::SetTime(const std::string& time_string) {
+eTimeStatus_t utils::SetTime(const std::string& time_string) {
     time_t mytime = time(0);
     struct tm* tm_ptr = localtime(&mytime);
     /* Date/Time format: HH:MM:SS_DD_MM_YYYY i.e. 00:00:00_01-01-2016 */

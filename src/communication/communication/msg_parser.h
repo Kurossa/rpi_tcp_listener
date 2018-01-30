@@ -2,11 +2,11 @@
  * app_msg_parser.hpp
  *
  *  Created on: Apr 20, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
 
-#ifndef APP_MSG_PARSER_APP_MSG_PARSER_HPP_
-#define APP_MSG_PARSER_APP_MSG_PARSER_HPP_
+#ifndef COMMUNICATION_MSG_PARSER_H_
+#define COMMUNICATION_MSG_PARSER_H_
 /*
  * Example message
 TCP_SET_TIME\n
@@ -74,4 +74,4 @@ private:
 };
 
 
-#endif /* APP_MSG_PARSER_APP_MSG_PARSER_HPP_ */
+#endif // COMMUNICATION_MSG_PARSER_H_
