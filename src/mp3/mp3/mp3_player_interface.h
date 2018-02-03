@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <app_config/app_constants.h>
 
-namespace mp3server
+namespace mp3player
 {
 
 enum Action {
@@ -47,10 +47,10 @@ enum Status {
 };
 
 const char STATE_STR[STATE_MAX][64] = { "AUDIO_IDLE",
-                                         "AUDIO_PLAY_ONCE",
-                                         "AUDIO_PLAY_IN_LOOP",
-                                         "AUDIO_PLAY_PAUSED"
-                                         "AUDIO_FAILED" };
+                                        "AUDIO_PLAY_ONCE",
+                                        "AUDIO_PLAY_IN_LOOP",
+                                        "AUDIO_PLAY_PAUSED"
+                                        "AUDIO_FAILED" };
 
 struct Message
 {
@@ -63,7 +63,7 @@ struct Message
 struct Reply
 {
     Status status;
-    eErrorCode_t error_code;
+    ErrorCode error_code;
 };
 
 } // namespace mp3server

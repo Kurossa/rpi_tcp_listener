@@ -10,7 +10,7 @@
 #include "player_stop_state.h"
 #include "mp3_player.h"
 
-using namespace mp3server;
+using namespace mp3player;
 
 PlayerPauseState::PlayerPauseState(Mp3Player& mp3_player, std::string& file_name, PlayMode play_mode):
     PlayerState(mp3_player),

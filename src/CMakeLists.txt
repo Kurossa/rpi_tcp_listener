@@ -8,6 +8,7 @@ add_subdirectory(app_config)
 add_subdirectory(communication)
 add_subdirectory(config_manager)
 add_subdirectory(mp3)
+add_subdirectory(ext/pugixml-1.8)
 add_subdirectory(tcp_connection)
 add_subdirectory(utilities)
 

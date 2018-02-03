@@ -17,7 +17,7 @@
 #include <net/route.h>
 #include <arpa/inet.h>
 #include <net/if.h>
-#include <string.h>
+#include <cstring>
 
 using namespace tcp;
 using namespace utils;
@@ -55,7 +55,7 @@ void tcp::CloseSocket(int& socket) {
     }
 }
 
-ConStatus_t tcp::ChangeIp(  const std::string& interface
+ConStatus_t tcp::ChangeIp( const std::string& interface
                          , const std::string& ip
                          , const std::string& mask
                          , const std::string& gateway) {

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<audio_app_cfg>
+	<network>
+		<ip>127.0.0.1</ip>
+		<mask>255.255.255.0</mask>
+		<gateway>192.168.0.1</gateway>
+		<port>9999</port>
+	</network>
+	<sounds>
+		<sound>file1</sound>
+		<sound>file2</sound>
+		<sound>file3</sound>
+		<sound>file4</sound>
+	</sounds>
+</audio_app_cfg>
+

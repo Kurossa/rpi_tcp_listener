@@ -4,8 +4,8 @@
 
 TEST (Mp3PlayerTest, DISABLED_PlayStopState) {
 
-    mp3server::Mp3Player mp3_player;
-    mp3_player.Play("test.mp3", mp3server::PlayMode::ONCE);
+    mp3player::Mp3Player mp3_player;
+    mp3_player.Play("test.mp3", mp3player::PlayMode::ONCE);
     mp3_player.SetVolume(100);
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
     mp3_player.SetVolume(50);
@@ -23,8 +23,8 @@ TEST (Mp3PlayerTest, DISABLED_PlayStopState) {
 
 TEST (Mp3PlayerTest, PlayPausePlayStopState) {
 
-    mp3server::Mp3Player mp3_player;
-    mp3_player.Play("123.mp3", mp3server::PlayMode::ONCE);
+    mp3player::Mp3Player mp3_player;
+    mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     mp3_player.Pause();
     mp3_player.SetVolume(70);
@@ -34,10 +34,10 @@ TEST (Mp3PlayerTest, PlayPausePlayStopState) {
     mp3_player.Resume();
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     mp3_player.Stop();
-    mp3_player.Play("123.mp3", mp3server::PlayMode::ONCE);
+    mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
-    mp3_player.Play("123.mp3", mp3server::PlayMode::ONCE);
+    mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
     printf("End of test!\n");
@@ -46,10 +46,10 @@ TEST (Mp3PlayerTest, PlayPausePlayStopState) {
 
 TEST (Mp3PlayerTest, DISABLED_PlayStopStopState) {
 
-    mp3server::Mp3Player mp3_player;
-    mp3_player.Play("1.mp3", mp3server::PlayMode::ONCE);
+    mp3player::Mp3Player mp3_player;
+    mp3_player.Play("1.mp3", mp3player::PlayMode::ONCE);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    mp3_player.Play("2.mp3", mp3server::PlayMode::ONCE);
+    mp3_player.Play("2.mp3", mp3player::PlayMode::ONCE);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     mp3_player.Stop();
     mp3_player.Stop();
@@ -61,15 +61,15 @@ TEST (Mp3PlayerTest, DISABLED_PlayStopStopState) {
 TEST (Mp3PlayerTest, DISABLED_PlayAndDestructPlayer) {
 
     {
-    mp3server::Mp3Player mp3_player;
-    mp3_player.Play("1.mp3", mp3server::PlayMode::ONCE);
+    mp3player::Mp3Player mp3_player;
+    mp3_player.Play("1.mp3", mp3player::PlayMode::ONCE);
     }
     printf("End of test!\n");
     EXPECT_TRUE(true);
 }
 TEST (Mp3PlayerTest, DISABLED_PlayAndWaitForEnd) {
-    mp3server::Mp3Player mp3_player;
-    mp3_player.Play("1.mp3", mp3server::PlayMode::ONCE);
+    mp3player::Mp3Player mp3_player;
+    mp3_player.Play("1.mp3", mp3player::PlayMode::ONCE);
     std::this_thread::sleep_for(std::chrono::seconds(6));
     printf("End of test!\n");
 

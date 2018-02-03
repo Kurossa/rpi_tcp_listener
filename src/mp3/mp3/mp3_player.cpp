@@ -18,7 +18,7 @@
 
 using std::mutex;
 using std::lock_guard;
-using namespace mp3server;
+using namespace mp3player;
 
 Mp3Player::Mp3Player():
     mh_m(nullptr),

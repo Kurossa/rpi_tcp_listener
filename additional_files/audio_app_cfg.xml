@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<audio_app_cfg>
+	<network>
+		<ip>192.168.125.100</ip>
+		<mask>255.255.0.0</mask>
+		<gateway>192.168.125.1</gateway>
+		<port>2055</port>
+	</network>
+	<sounds>
+		<sound>S030secL</sound>
+		<sound>S030secR</sound>
+		<sound>S150secL</sound>
+		<sound>S150secR</sound>
+		<sound>S11025spsL</sound>
+		<sound>S11025spsR</sound>
+		<sound>S22050spsL</sound>
+		<sound>S22050spsR</sound>
+		<sound>S44100spsL</sound>
+		<sound>S44100spsR</sound>
+	</sounds>
+</audio_app_cfg>
+

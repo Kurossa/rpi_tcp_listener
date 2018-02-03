@@ -10,7 +10,7 @@
 #include "player_stop_state.h"
 #include "mp3_player.h"
 
-using namespace mp3server;
+using namespace mp3player;
 
 namespace
 {

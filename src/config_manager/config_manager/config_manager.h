@@ -1,43 +1,50 @@
-#ifndef SOURCES_APP_CONFIG_MANAGER_HPP
-#define SOURCES_APP_CONFIG_MANAGER_HPP
+#ifndef CONFIG_MANAGER_CONFIG_MANAGER_H_
+#define CONFIG_MANAGER_CONFIG_MANAGER_H_
 
-#include "config_parser.h"
 #include <map>
 #include <list>
 #include <string>
+#include <vector>
 
-typedef enum eConfigManager {
-    CONFIG_MANAGER_OK,
-    CONFIG_MANAGER_NOK
-}eConfigManager_t;
+namespace config
+{
 
-struct sDeviceConfig {
-    std::string ipString;
-    std::string maskString;
-    std::string gatewayString;
+enum Status {
+    OK,
+    FILE_NOT_FOUND,
+    NOT_ALL_NODES_PARSED, //This is not a failure, default values will be taken
+    CONFIG_NUM,
+};
+
+struct Configuration {
+    std::string ip_str;
+    std::string gateway_str;
+    std::string mask_str;
     int port;
-    std::vector<std::string> sounds;
-    std::vector<std::string> soundsInRam;
+    std::vector<std::string> compressed_files;
+    std::vector<std::string> sound_files;
 };
 
 
-class cConfigManager: public cConfigParser {
+class ConfigManager {
 public:
-    cConfigManager(const char* fileName) : cConfigParser(fileName) {}
-    ~cConfigManager() {}
+    ConfigManager();
+    ~ConfigManager() {}
 
-    eConfigManager_t init();
-    eConfigManager_t getConfigFile(char* stream, size_t& size);
-    std::list<sDeviceConfig>* get_devicesConfigList() { return &deviceConfigList_m; }
+    config::Status ParseConfigFile(const char* file_name);
+    config::Configuration GetConfig() const { return configuration_m; }
+    config::Configuration GetDefaultConfig() const { return default_configuration_m; }
+    config::Status GetConfigFromFile(std::string& stream) const;
+    config::Status SaveConfigToFile(std::string& stream) const;
 
 private:
-    eConfigManager_t get_ipStr(std::string descr, std::string& ipString);
-    eConfigManager_t get_maskStr(std::string descr, std::string& ipString);
-    eConfigManager_t get_gatewayStr(std::string descr, std::string& gatewayString);
-    eConfigManager_t get_port(std::string descr, int& port);
-    eConfigManager_t get_sounds(std::string descr, std::vector<std::string>& sounds, std::vector<std::string>& soundsInRam);
-    std::list<sDeviceConfig> deviceConfigList_m;
+    config::Status ParseXml(const char* file_name);
+
+    config::Configuration configuration_m;
+    config::Configuration default_configuration_m;
 
 };
 
-#endif /*SOURCES_APP_CONFIG_MANAGER_HPP*/
+} // config
+
+#endif // CONFIG_MANAGER_CONFIG_MANAGER_H_

@@ -2,6 +2,8 @@
 #include <utilities/zip.h>
 #include <utilities/logger.h>
 
+using namespace utils;
+
 namespace
 {
 
@@ -75,19 +77,19 @@ void ZipTest::TestCompressUncompress(const std::vector<char>& test_vector, const
     fwrite(test_vector.data(), 1, test_vector.size(), test_file);
     fclose(test_file);
 
-    eZipStaus_t status = ZIP_NUM;
+    ZipStatus status = ZipStatus::ZIP_NUM;
     switch (mode)
     {
     case ZIP_COMPRESS:
-        status = ZipCompress(test_file_name_m.c_str(), output_file_name_m.c_str());
+        status = utils::ZipCompress(test_file_name_m.c_str(), output_file_name_m.c_str());
         break;
     case ZIP_UNCOMPRESS:
-        status = ZipUncompress(test_file_name_m.c_str(), output_file_name_m.c_str());
+        status = utils::ZipUncompress(test_file_name_m.c_str(), output_file_name_m.c_str());
         break;
     default:
         ASSERT_TRUE(false);
     }
-    EXPECT_EQ (ZIP_OK, status);
+    EXPECT_EQ (ZipStatus::OK, status);
     ASSERT_TRUE(FileExists(output_file_name_m));
     std::vector<char> out_vector;
     EXPECT_TRUE(ReadFileBlockToBuffer(out_vector, output_file_name_m));
@@ -136,10 +138,10 @@ TEST_F(ZipTest, ZipCompressUncompressRandomPayload) {
     fwrite(random_test_block.data(), 1, random_test_block.size(), test_file);
     fclose(test_file);
 
-    eZipStaus_t status = ZipCompress(test_file_name_m.c_str(), output_file_name_m.c_str());
-    EXPECT_EQ (ZIP_OK, status);
+    ZipStatus status = ZipCompress(test_file_name_m.c_str(), output_file_name_m.c_str());
+    EXPECT_EQ (ZipStatus::OK, status);
     status = ZipUncompress(output_file_name_m.c_str(), output2_file_name_m.c_str());
-    EXPECT_EQ (ZIP_OK, status);
+    EXPECT_EQ (ZipStatus::OK, status);
 
     ASSERT_TRUE(FileExists(output_file_name_m));
     ASSERT_TRUE(FileExists(output2_file_name_m));
@@ -159,20 +161,20 @@ TEST_F(ZipTest, ZipCompressUncompressRandomPayload) {
 }
  
 TEST_F (ZipTest, ZipSameSourceAsDestination) {
-    eZipStaus_t status = ZIP_NUM;
+    ZipStatus status = ZIP_NUM;
     char input_zip[25] = "same_file.txt";
     char output_zip[25] = "same_file.txt";
     status = ZipUncompress(input_zip, output_zip);
-    EXPECT_EQ(status, ZIP_SAME_SRC_DST);
+    EXPECT_EQ(status, ZipStatus::SAME_SRC_DST);
     status = ZipCompress(input_zip, output_zip);
-    EXPECT_EQ(status, ZIP_SAME_SRC_DST);
+    EXPECT_EQ(status, ZipStatus::SAME_SRC_DST);
 }
 
 TEST_F (ZipTest, ZipFileNotExists) {
-        eZipStaus_t status = ZIP_NUM;
+        ZipStatus status = ZIP_NUM;
         char input_zip[25] = "not_existing_file.txt";
         status = ZipCompress(input_zip, output_file_name_m.c_str());
-        EXPECT_EQ(status, ZIP_FILE_NOT_EXISTS);
+        EXPECT_EQ(status, ZipStatus::FILE_NOT_EXISTS);
         status = ZipUncompress(input_zip, output_file_name_m.c_str());
-        EXPECT_EQ(status, ZIP_FILE_NOT_EXISTS);
+        EXPECT_EQ(status, ZipStatus::FILE_NOT_EXISTS);
 }

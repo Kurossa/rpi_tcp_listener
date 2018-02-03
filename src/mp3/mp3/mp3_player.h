@@ -21,7 +21,7 @@
 #include <ao/ao.h>
 #include <mpg123.h>
 
-namespace mp3server
+namespace mp3player
 {
 
 class Mp3Player

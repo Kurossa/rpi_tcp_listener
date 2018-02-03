@@ -1,157 +1,99 @@
 #include "config_manager.h"
-#include <utilities/logger.h>
 #include <app_config/app_constants.h>
-#include <strings.h>
+#include <utilities/logger.h>
+#include <utilities/zip.h>
+#include <pugixml/pugixml.hpp>
+#include <iostream>
+#include <string>
 #include <sstream>
-#include <termios.h>
+#include <cstring>
+#include <vector>
 
 using std::vector;
 using std::string;
-using std::istringstream;
-using std::skipws;
+
 using namespace utils;
+using namespace config;
 
-static string removeSpaces(string input) {
-    string output;
-    for (string::iterator it = input.begin(); it != input.end(); ++it) {
-        if (*it != ' ' && *it != '\t') {
-            output.push_back(*it);
-        }
-    }
-    return output;
+ConfigManager::ConfigManager()
+{
+    default_configuration_m = {
+        "127.0.0.1",
+        "255.255.255.0",
+        "",
+        2055,
+        std::vector<std::string>(),
+        std::vector<std::string>()};
+    configuration_m = default_configuration_m;
 }
 
-eConfigManager_t cConfigManager::init() {
-    eConfigManager_t status = CONFIG_MANAGER_NOK;
-
-    vector<string> ipConfVect;
-    if (PARSER_CONF_OK == getConfig("ip_config", ipConfVect)) {
-        for (vector<string>::iterator it = ipConfVect.begin(); it != ipConfVect.end(); ++it) {
-
-            sDeviceConfig devConfig;
-
-            int cmStatus = CONFIG_MANAGER_OK;
-            cmStatus |= get_ipStr(*it, devConfig.ipString);
-            cmStatus |= get_gatewayStr(*it, devConfig.gatewayString);
-            cmStatus |= get_maskStr(*it, devConfig.maskString);
-            cmStatus |= get_port(*it, devConfig.port);
-
-            if (cmStatus == CONFIG_MANAGER_OK) {
-                logPrintf(LogLevel::SCREEN, "Ethernet configuration: ip address: %s:%d, mask: %s, gateway: %s\n"
-                        , devConfig.ipString.c_str()
-                        , devConfig.port
-                        , devConfig.maskString.c_str()
-                        , devConfig.gatewayString.c_str());
-
-                vector<string> soundsConfVect;
-                getConfig("sounds_config", soundsConfVect);
-                for (vector<string>::iterator it = soundsConfVect.begin(); it != soundsConfVect.end(); ++it) {
-                    string soundsDescr = removeSpaces(*it);
-                    int soundStatus = CONFIG_MANAGER_OK;
-                    soundStatus = get_sounds(soundsDescr, devConfig.sounds, devConfig.soundsInRam);
-
-                    if (soundStatus == CONFIG_MANAGER_OK) {
-                        deviceConfigList_m.push_back(devConfig);
-                        status = CONFIG_MANAGER_OK;
-                    } else {
-                        logPrintf(LogLevel::ERROR, "Config file - Wrong sounds parameters.\n");
-                    }
-                }
-            } else {
-                logPrintf(LogLevel::ERROR, "Config file - Wrong parameters.\n");
-            }
-        }
-    } else {
-        logPrintf(LogLevel::ERROR, "Config file - No configuration in config file. \n");
-    }
-
-    if (deviceConfigList_m.empty()) {
-        logPrintf(LogLevel::ERROR, "Config file - No devices configured.\n");
-    }
-
-    return status;
+config::Status ConfigManager::ParseConfigFile(const char* file_name)
+{
+    //TODO: add chceking values of ipv4
+    return ParseXml(file_name);
 }
 
-eConfigManager_t cConfigManager::getConfigFile(char* stream, size_t& size) {
-    eConfigManager_t status = CONFIG_MANAGER_NOK;
-    bzero(stream, size);
-    size = 0;
-    FILE* source = fopen(fileName_m, "r");
+config::Status ConfigManager::ParseXml(const char* file_name)
+{
+    Status parse_status = Status::OK;
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_file(file_name);
+    if (result.status != pugi::status_ok)
+    {
+        logPrintf(LogLevel::ERROR, "File does not exists\n");
+        return FILE_NOT_FOUND;
+    }
+
+    pugi::xml_node sounds = doc.child("audio_app_cfg").child("sounds");
+    for (pugi::xml_node sound = sounds.child("sound"); sound; sound = sound.next_sibling("sound"))
+    {
+        configuration_m.compressed_files.push_back(sound.child_value());
+        string file_in_ram(string(ram_g) + sound.child_value());
+        ZipStatus status = utils::ZipUncompress(sound.child_value(), file_in_ram.c_str());
+        if (ZipStatus::OK != status) {
+            logPrintf(LogLevel::WARNING, "Error decoding file: %s, no file append to list.\n",sound.child_value());
+            file_in_ram.clear();
+            parse_status = Status::NOT_ALL_NODES_PARSED;
+        }
+        configuration_m.sound_files.push_back(file_in_ram);
+    }
+
+    pugi::xml_node net_ip = doc.child("audio_app_cfg").child("network").child("ip");
+    pugi::xml_node net_mask = doc.child("audio_app_cfg").child("network").child("mask");
+    pugi::xml_node net_gateway = doc.child("audio_app_cfg").child("network").child("gateway");
+    pugi::xml_node net_port = doc.child("audio_app_cfg").child("network").child("port");
+    //TODO: Add checking ip values;
+    configuration_m.ip_str = net_ip.child_value();
+    configuration_m.mask_str = net_mask.child_value();
+    configuration_m.gateway_str = net_gateway.child_value();
+    std::istringstream(net_port.child_value()) >> std::skipws >> configuration_m.port;
+
+    return parse_status;
+}
+
+config::Status ConfigManager::GetConfigFromFile(std::string& stream) const {
+    char buffer[FILE_BLOCK];
+    FILE* source = fopen(config_file_g, "rb");
     if (source) {
-        size = fread(stream, 1, 2048, source);
-        status = CONFIG_MANAGER_OK;
-    }
-    fclose(source);
-    return status;
-}
-
-eConfigManager_t cConfigManager::get_ipStr(string descr, string& ipString) {
-    eConfigManager_t status = CONFIG_MANAGER_NOK;
-    string val;
-    if (PARSER_CONF_OK == getAttrVal(val, descr, "ip")) {
-        istringstream(val) >> skipws >> ipString;
-        status = CONFIG_MANAGER_OK;
-    }
-    return status;
-}
-
-eConfigManager_t cConfigManager::get_maskStr(string descr, string& ipString) {
-    eConfigManager_t status = CONFIG_MANAGER_NOK;
-    string val;
-    if (PARSER_CONF_OK == getAttrVal(val, descr, "mask")) {
-        istringstream(val) >> skipws >> ipString;
-        status = CONFIG_MANAGER_OK;
-    }
-    return status;
-}
-
-eConfigManager_t cConfigManager::get_gatewayStr(string descr, string& gatewayString) {
-    eConfigManager_t status = CONFIG_MANAGER_NOK;
-    string val;
-    if (PARSER_CONF_OK == getAttrVal(val, descr, "gateway")) {
-        istringstream(val) >> skipws >> gatewayString;
-        status = CONFIG_MANAGER_OK;
-    }
-    return status;
-}
-
-eConfigManager_t cConfigManager::get_port(string descr, int& port) {
-    eConfigManager_t status = CONFIG_MANAGER_NOK;
-    string val;
-    if (PARSER_CONF_OK == getAttrVal(val, descr, "port")) {
-        istringstream(val) >> skipws >> port;
-        status = CONFIG_MANAGER_OK;
-    }
-    return status;
-}
-
-eConfigManager_t cConfigManager::get_sounds(string descr, vector<string>& sounds, vector<string>& soundsInRam) {
-    eConfigManager_t status = CONFIG_MANAGER_NOK;
-    string val;
-    if (PARSER_CONF_OK == getAttrVal(val, descr, "sound")) {
-        istringstream(val) >> skipws >> val;
-        int soundsNum = 0;
-        getAttrNum(soundsNum,val);
-        logPrintf(LogLevel::SCREEN,"Sound(s) number: %d\n",soundsNum);
-        int soundsStatus = CONFIG_MANAGER_OK;
-        for (int i = 0; i < soundsNum; ++i) {
-            string attrByNum;
-            soundsStatus |= getAttrByNum(attrByNum, i, val);
-            if (CONFIG_MANAGER_OK == soundsStatus) {
-                string encodedFile(encoded);
-                encodedFile.append(attrByNum);
-                sounds.push_back(encodedFile);
-                string ramFile(ram);
-                ramFile.append(attrByNum);
-                soundsInRam.push_back(ramFile);
-                logPrintf(LogLevel::SCREEN,"Sound %d name: %s\n",i+1, attrByNum.c_str());
-            }
+        while (fread(buffer, 1, FILE_BLOCK, source)) {
+            memset(&buffer, 0, FILE_BLOCK);
+            stream.append(std::string(buffer));
         }
-
-        if (CONFIG_MANAGER_OK == soundsStatus) {
-            status = CONFIG_MANAGER_OK;
-        }
+        fclose(source);
+        return config::OK;
     }
-    return status;
+    return config::FILE_NOT_FOUND;
+}
+
+config::Status ConfigManager::SaveConfigToFile(std::string& stream) const
+{
+    FILE* dest = fopen(config_file_g, "wb");
+    if (dest)
+    {
+        fwrite(stream.c_str(), 1, stream.size(), dest);
+        fclose(dest);
+        return config::OK;
+    }
+    return config::FILE_NOT_FOUND;
 }
 

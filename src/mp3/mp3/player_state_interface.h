@@ -11,7 +11,7 @@
 #include "mp3_player_interface.h"
 #include <string>
 
-namespace mp3server
+namespace mp3player
 {
 
 class Mp3Player;

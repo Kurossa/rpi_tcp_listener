@@ -10,7 +10,7 @@
 
 #include "player_state_interface.h"
 
-namespace mp3server
+namespace mp3player
 {
 
 class PlayerStopState : public PlayerState

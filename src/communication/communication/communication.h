@@ -1,28 +1,29 @@
 /*
- * app_communication.hpp
+ * app_communication.h
  *
  *  Created on: Apr 25, 2016
  *      Author: Kurossa
  */
-#include "msg_parser.h"
-#include <mp3/mp3.h>
-#include <config_manager/config_manager.h>
-#include <utilities/time.h>
 
+#include "msg_parser.h"
+#include <config_manager/config_manager.h>
+#include <mp3/mp3_player.h>
+#include <utilities/time.h>
 #include <string>
 
 #ifndef COMMUNICATION_COMMUNICATION_H_
 #define COMMUNICATION_COMMUNICATION_H_
 
-class cCommunication {
+namespace communication
+{
+
+
+class Communication {
 public:
-    cCommunication(mqSend_t* mqSend, mqReply_t* mqReply, cConfigManager* conifgManager) :
-            mqSend_m(mqSend),
-            mqReply_m(mqReply),
-            conifgManager_m(conifgManager),
-            command_m(0) {
-    }
-    ~cCommunication(void) {}
+    Communication(const config::ConfigManager& config_manager) :
+            config_manager_m(config_manager),
+            command_m(0) {}
+    ~Communication(void) {}
     void handleCommand(char* cmdMsg,char* replyMsg);
     void handleSetTime(char* replyMsg);
     void handlePlay(char* replyMsg);
@@ -33,16 +34,17 @@ public:
     void handleReset(char* replyMsg);
     void handleStatus(char* replyMsg);
 private:
-    mqSend_t* mqSend_m;
-    mqReply_t* mqReply_m;
-    cConfigManager* conifgManager_m;
-    sMp3Message mp3Cmd_m;
-    sMp3Reply mp3Reply_m;
-    cMsgParser msgParser_m;
+    const config::ConfigManager config_manager_m;
+    cMsgParser msg_parser_m;
+    mp3player::Mp3Player mp3_player_m;
 
     int command_m;
     std::string time_str_m;
 
 };
+
+
+} // namespace communication
+
 
 #endif // COMMUNICATION_COMMUNICATION_H_

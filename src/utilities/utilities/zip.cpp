@@ -7,8 +7,8 @@
 
 using namespace utils;
 
-eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name) {
-    eZipStaus_t status = ZIP_UNCOMP_FAILED;
+ZipStatus utils::ZipUncompress(const char* source_name, const char* destination_name) {
+    ZipStatus status = ZipStatus::UNCOMP_FAILED;
     char buf_normal[1024];
     char buf_reversed[1024];
     char buf_odd_char[2];
@@ -17,7 +17,7 @@ eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name)
 
     if (source_name == destination_name || strcmp(source_name, destination_name) == 0) {
         logPrintf(LogLevel::ERROR, "Uncompress failed: same source and destination.\n");
-        status = ZIP_SAME_SRC_DST;
+        status = ZipStatus::SAME_SRC_DST;
     } else {
         // check if file exists
         FILE* source = fopen(source_name, "rb");
@@ -55,9 +55,9 @@ eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name)
 
             fclose(source);
             fclose(dest);
-            status = ZIP_OK;
+            status = ZipStatus::OK;
         } else {
-            status = ZIP_FILE_NOT_EXISTS;
+            status = ZipStatus::FILE_NOT_EXISTS;
             logPrintf(LogLevel::ERROR, "Uncompress failed: Source file does not exists.\n");
         }
     }
@@ -65,16 +65,16 @@ eZipStaus_t ZipUncompress(const char* source_name, const char* destination_name)
     return status;
 }
 
-eZipStaus_t ZipCompress(const char* source_name, const char* destination_name) {
-    eZipStaus_t status = ZIP_UNCOMP_FAILED;
-    char buf_normal[1024];
-    char buf_reversed[1024];
+ZipStatus utils::ZipCompress(const char* source_name, const char* destination_name) {
+    ZipStatus status = ZipStatus::UNCOMP_FAILED;
+    char buf_normal[FILE_BLOCK];
+    char buf_reversed[FILE_BLOCK];
     char buf_odd_char[2];
     size_t size_read, size_read_total, size_total;
     bool isOdd = false;
 
     if (source_name == destination_name || strcmp(source_name, destination_name) == 0) {
-        status = ZIP_SAME_SRC_DST;
+        status = ZipStatus::SAME_SRC_DST;
         logPrintf(LogLevel::ERROR, "Compress failed: same source and destination.\n");
     } else {
         FILE* source = fopen(source_name, "rb");
@@ -112,9 +112,9 @@ eZipStaus_t ZipCompress(const char* source_name, const char* destination_name) {
 
             fclose(source);
             fclose(dest);
-            status = ZIP_OK;
+            status = ZipStatus::OK;
         } else {
-            status = ZIP_FILE_NOT_EXISTS;
+            status = ZipStatus::FILE_NOT_EXISTS;
             logPrintf(LogLevel::ERROR, "Compress failed: Source file does not exists.\n");
         }
     }
