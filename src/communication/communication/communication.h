@@ -14,9 +14,8 @@
 #ifndef COMMUNICATION_COMMUNICATION_H_
 #define COMMUNICATION_COMMUNICATION_H_
 
-namespace communication
+namespace comm
 {
-
 
 class Communication {
 public:
@@ -43,8 +42,7 @@ private:
 
 };
 
-
-} // namespace communication
+} // namespace comm
 
 
 #endif // COMMUNICATION_COMMUNICATION_H_

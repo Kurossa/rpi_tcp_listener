@@ -12,7 +12,7 @@
 #include <string.h>
 
 using namespace utils;
-using namespace communication;
+using namespace comm;
 
 void Communication::handleCommand(char* cmdMsg, char* replyMsg) {
     //printf("Received: %s", cmdMsg);

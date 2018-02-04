@@ -32,6 +32,9 @@
 #define MSG_NODE_SIZE   (2048)
 #define MSG_MAX_NODES   (5)
 
+namespace comm
+{
+
 enum MsgCmd {
     TCP_SET_TIME,       // 0
     TCP_PLAY,           // 1
@@ -44,53 +47,39 @@ enum MsgCmd {
     TCP_CMD_NUM         // 8
 };
 
-const char msg_commands[TCP_CMD_NUM][MSG_COMAND_SIZE] = { "TCP_SET_TIME",
-                                                          "TCP_PLAY",
-                                                          "TCP_STOP",
-                                                          "TCP_SET_CFG",
-                                                          "TCP_GET_CFG",
-                                                          "TCP_SET_VOLUME",
-                                                          "TCP_RESET",
-                                                          "TCP_STATUS" };
-
-const size_t msg_commands_nodes[TCP_CMD_NUM] = { 3,     //"TCP_SET_TIME"
-                                                 4,     //"TCP_PLAY"
-                                                 2,     //"TCP_STOP"
-                                                 4,     //"TCP_SET_CFG"
-                                                 2,     //"TCP_GET_CFG"
-                                                 3,     //"TCP_SET_VOLUME"
-                                                 2,     //"TCP_RESET"
-                                                 2};    //"TCP_STATUS"
-
-const char msg_command_end[] = "END";
-
-enum MsgParserStatus {
-    MSG_PARS_OK,
-    MSG_PARS_NOK,
+enum ParserStatus {
+    OK,
+    TOO_MANY_NODES,
+    WRONG_MESSAGE,
+    WRONG_CFG_SIZE,
     MSG_PARSER_NUM
 };
 
 class MsgParser {
 public:
-    MsgParser() {}
+    MsgParser() : command_m(TCP_CMD_NUM) {}
     ~MsgParser() {}
-    void ParseMsg(const char* msg, const size_t msg_length);
-    std::vector<std::string> GetMsgVector() const { return parsed_masage_m; }
-    size_t GetMsgVectorSize() const { return parsed_masage_m.size(); }
-    std::string GetMsgStrAt(size_t index) const;
 
-    MsgCmd GetMsgCommand(void);
+    ParserStatus             ParseMsg(const char* msg, const size_t msg_length);
+    MsgCmd                   GetMsgCommand() const { return command_m; }
+    std::string              GetMsgCommandStr() const;
+    std::vector<std::string> GetMsgVector() const { return parsed_masage_m; }
+    size_t                   GetMsgVectorSize() const { return parsed_masage_m.size(); }
+    std::string              GetMsgStrAt(size_t index) const;
+    std::string              GetMsgAtributeNo(size_t index) const;
+    void                     Clear() { parsed_masage_m.clear(); }
 
 private:
-    void GetConfigStream(  const char* msg
-                         , const size_t msg_length
-                         , const size_t offset
-                         , size_t& read_cfg_size);
-    //void ParseSetCfgMsg(const char* msg, const int msgLength);
+    MsgCmd VerifyAndGetMsgCommand(void);
+    ParserStatus GetConfigStream(  const char* msg
+                                 , const size_t msg_length
+                                 , const size_t offset
+                                 , size_t& read_cfg_size);
+
     std::vector<std::string> parsed_masage_m;
-    //size_t msg_nodes_num_m;
-    char msg_nodes_str_m[MSG_MAX_NODES][MSG_NODE_SIZE];
+    MsgCmd command_m;
 };
 
+} // namespace comm
 
 #endif // COMMUNICATION_MSG_PARSER_H_

@@ -15,7 +15,7 @@
 #include <cstring>
 
 using namespace utils;
-using namespace communication;
+using namespace comm;
 using std::string;
 using std::list;
 using std::vector;
