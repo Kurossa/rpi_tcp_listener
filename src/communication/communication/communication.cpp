@@ -16,9 +16,9 @@ using namespace communication;
 
 void Communication::handleCommand(char* cmdMsg, char* replyMsg) {
     //printf("Received: %s", cmdMsg);
-    msg_parser_m.parseMsg(cmdMsg, strlen(cmdMsg));
+    msg_parser_m.ParseMsg(cmdMsg, strlen(cmdMsg));
     utils::GetTime(time_str_m);
-    command_m = msg_parser_m.getMsgCommand();
+    command_m = msg_parser_m.GetMsgCommand();
     logPrintf(LogLevel::SCREEN, "Received %d command\n", command_m);
 
     switch (command_m) {
@@ -55,7 +55,7 @@ void Communication::handleCommand(char* cmdMsg, char* replyMsg) {
 
 void Communication::handleSetTime(char* replyMsg) {
     ErrorCode error_code = ERROR_CODE_SET_TIME_ERROR;
-    if (utils::TIME_SET_OK == utils::SetTime(msg_parser_m.getMsgNNodeStr(1))) {
+    if (utils::TIME_SET_OK == utils::SetTime(msg_parser_m.GetMsgStrAt(1))) {
         error_code = ERROR_CODE_OK;
     }
     utils::GetTime(time_str_m);
@@ -63,12 +63,12 @@ void Communication::handleSetTime(char* replyMsg) {
 }
 
 void Communication::handlePlay(char* replyMsg) {
-    int file_num = atoi(msg_parser_m.getMsgNNodeStr(1));
+    int file_num = atoi(msg_parser_m.GetMsgStrAt(1).c_str());
     mp3player::PlayMode play_mode = mp3player::PlayMode::ONCE;
 
-    if(0==strcmp(msg_parser_m.getMsgNNodeStr(2),"ONCE")){
+    if(0==strcmp(msg_parser_m.GetMsgStrAt(2).c_str(),"ONCE")){
         play_mode = mp3player::PlayMode::ONCE;
-    } else if (0==strcmp(msg_parser_m.getMsgNNodeStr(2),"IN_LOOP")) {
+    } else if (0==strcmp(msg_parser_m.GetMsgStrAt(2).c_str(),"IN_LOOP")) {
         play_mode = mp3player::PlayMode::IN_LOOP;
     } else {
         play_mode = mp3player::PlayMode::PLAY_MODE_MAX;
@@ -86,7 +86,7 @@ void Communication::handleStop(char* replyMsg) {
 void Communication::handleSetCfg(char* replyMsg) {
     ErrorCode error_code = ERROR_CODE_OK;
     FILE* dest = fopen(config_file_g, "wb");
-    fwrite(msg_parser_m.getMsgNNodeStr(2), 1, strlen(msg_parser_m.getMsgNNodeStr(2)), dest);
+    fwrite(msg_parser_m.GetMsgStrAt(2).c_str(), 1, strlen(msg_parser_m.GetMsgStrAt(2).c_str()), dest);
     fclose(dest);
     //printf("Config: %s \n",msgParser_m.getMsgNNodeStr(2));
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), error_code);
@@ -103,7 +103,7 @@ void Communication::handleGetCfg(char* replyMsg) {
 
 void Communication::handleVolume(char* replyMsg) {
 
-    int volume = atoi(msg_parser_m.getMsgNNodeStr(1));
+    int volume = atoi(msg_parser_m.GetMsgStrAt(1).c_str());
     mp3_player_m.SetVolume(volume);
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetPlayModeStr().c_str(), ERROR_CODE_OK);
 }

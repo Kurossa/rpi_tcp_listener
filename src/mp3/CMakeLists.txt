@@ -1,5 +1,6 @@
 project (mp3)
 
+find_library(PTHREAD_LIB pthread)
 find_library(AO_LIB ao)
 find_library(MPG123_LIB mpg123)
 
@@ -18,6 +19,6 @@ add_library (mp3
 
 target_include_directories (mp3 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries (mp3 PRIVATE "${MPG123_LIB}" "${AO_LIB}"
+target_link_libraries (mp3 PRIVATE "${PTHREAD_LIB}" "${MPG123_LIB}" "${AO_LIB}"
     PUBLIC utilities app_config)
 

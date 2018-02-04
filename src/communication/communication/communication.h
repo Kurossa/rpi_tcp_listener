@@ -35,7 +35,7 @@ public:
     void handleStatus(char* replyMsg);
 private:
     const config::ConfigManager config_manager_m;
-    cMsgParser msg_parser_m;
+    MsgParser msg_parser_m;
     mp3player::Mp3Player mp3_player_m;
 
     int command_m;

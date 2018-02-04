@@ -2,11 +2,11 @@
  * app_constants.h
  *
  *  Created on: Apr 27, 2016
- *      Author: mariusz
+ *      Author: Kurosssa
  */
 
-#ifndef APP_CONSTS_HPP_
-#define APP_CONSTS_HPP_
+#ifndef APP_CONSTS_H_
+#define APP_CONSTS_H_
 
 #define UNUSED_PARAM(expr) do { (void)(expr); } while (0)
 
@@ -33,4 +33,4 @@ enum ErrorCode {
 };
 
 
-#endif /* APP_CONSTS_HPP_ */
+#endif /* APP_CONSTS_H_ */
