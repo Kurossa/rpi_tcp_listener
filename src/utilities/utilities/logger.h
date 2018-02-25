@@ -44,6 +44,7 @@ private:
     bool write_to_file_m;
 
     FILE * file_m = nullptr;
+    //TODO: convert this to string
     char dir_name_m[1024];
     char log_dir_name_m[1024];
     char log_file_name_m[1024];

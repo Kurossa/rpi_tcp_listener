@@ -163,11 +163,11 @@ Logger::Logger(bool log_to_file, bool verbose_mode) :
     verbose_mode_m(verbose_mode)
   , write_to_file_m(log_to_file)
   , file_m(nullptr)
-  , dir_name_m("log/")
-  , log_file_name_m("log")
   , file_count_m(0)
   , line_count_m(0)
 {
+    strcpy(dir_name_m, "log/");
+    strcpy(log_file_name_m, "log");
     CreateLogFile();
 }
 
