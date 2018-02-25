@@ -6,7 +6,6 @@
  */
 
 #include "msg_parser.h"
-#include <utilities/logger.h>
 #include <string.h>
 #include <stdlib.h>
 

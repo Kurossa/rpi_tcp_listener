@@ -8,6 +8,7 @@
 #include "msg_parser.h"
 #include <config_manager/config_manager.h>
 #include <mp3/mp3_player.h>
+#include <utilities/logger.h>
 #include <utilities/time.h>
 #include <string>
 
@@ -19,8 +20,9 @@ namespace comm
 
 class Communication {
 public:
-    Communication(const config::ConfigManager& config_manager) :
+    Communication(const config::ConfigManager& config_manager, utils::Logger& logger) :
             config_manager_m(config_manager),
+            logger_m(logger),
             command_m(0) {}
     ~Communication(void) {}
     void handleCommand(char* cmdMsg,char* replyMsg);
@@ -36,6 +38,7 @@ private:
     const config::ConfigManager config_manager_m;
     MsgParser msg_parser_m;
     mp3player::Mp3Player mp3_player_m;
+    utils::Logger& logger_m;
 
     int command_m;
     std::string time_str_m;

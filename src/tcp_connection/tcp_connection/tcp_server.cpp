@@ -7,8 +7,6 @@
 
 #include "tcp_server.h"
 
-#include <utilities/logger.h>
-
 using namespace tcp;
 using namespace utils;
 
@@ -51,19 +49,19 @@ ConStatus_t Server::BindAndListen(void) {
 
     if (-1 == setsockopt(conn_socket_fd_m, SOL_SOCKET, SO_REUSEADDR, &true_val, sizeof(int))
         || conn_socket_fd_m < 0) {
-        logPrintf(LogLevel::ERROR, "ERROR opening socket");
+        logger_m.Log(LogLevel::ERROR, "ERROR opening socket");
         CloseSocket(conn_socket_fd_m);
         return TCP_ERROR_OPENING_PORT;
     }
 
     if (-1 == bind(conn_socket_fd_m, (sockaddr *) &my_addr_m, sizeof(my_addr_m))) {
-        logPrintf(LogLevel::ERROR, "ERROR on binding\n");
+        logger_m.Log(LogLevel::ERROR, "ERROR on binding\n");
         tcp::CloseSocket(conn_socket_fd_m);
         return TCP_ERROR_ON_BINDING;
     }
 
     if (-1 == listen(conn_socket_fd_m, tcp::MAX_CONNECTIONS)) {
-        logPrintf(LogLevel::ERROR, "ERROR on listen\n");
+        logger_m.Log(LogLevel::ERROR, "ERROR on listen\n");
         tcp::CloseSocket(conn_socket_fd_m);
         return TCP_ERROR_ON_LISTEN;
     }
@@ -75,7 +73,7 @@ ConStatus_t Server::Accept(void)
     socklen_t addr_len = sizeof(client_addr_m);
     if (-1 == (client_socket_fd_m = accept(conn_socket_fd_m, (sockaddr *) &client_addr_m, &addr_len)))
     {
-        logPrintf(LogLevel::ERROR, "ERROR on accept\n");
+        logger_m.Log(LogLevel::ERROR, "ERROR on accept\n");
         // ?? Do we need that // ::CloseSocket(newsockfd_m);
         return TCP_ERROR_ACCEPT_SOCKET;
     }

@@ -1,6 +1,7 @@
 #ifndef CONFIG_MANAGER_CONFIG_MANAGER_H_
 #define CONFIG_MANAGER_CONFIG_MANAGER_H_
 
+#include <utilities/logger.h>
 #include <map>
 #include <list>
 #include <string>
@@ -11,8 +12,8 @@ namespace config
 
 enum Status {
     OK,
+    MISSING_FIELDS_IN_CONFIG, //This is not a failure, default values will be taken
     FILE_NOT_FOUND,
-    NOT_ALL_NODES_PARSED, //This is not a failure, default values will be taken
     CONFIG_NUM,
 };
 
@@ -28,7 +29,7 @@ struct Configuration {
 
 class ConfigManager {
 public:
-    ConfigManager();
+    ConfigManager(utils::Logger& logger);
     ~ConfigManager() {}
 
     config::Status ParseConfigFile(const char* file_name);
@@ -42,7 +43,7 @@ private:
 
     config::Configuration configuration_m;
     config::Configuration default_configuration_m;
-
+    utils::Logger& logger_m;
 };
 
 } // config

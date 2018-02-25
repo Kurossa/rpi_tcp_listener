@@ -16,7 +16,7 @@ namespace tcp
 
 class Server : private Connection {
 public:
-    Server(const int port) : Connection(port) {}
+    Server(const int port, utils::Logger& logger) : Connection(port, logger) {}
     ~Server(void) {}
 
     ConStatus_t Connect(void);

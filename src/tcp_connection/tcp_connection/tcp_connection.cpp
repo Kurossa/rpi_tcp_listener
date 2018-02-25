@@ -7,7 +7,6 @@
 
 #include "tcp_connection.h"
 
-#include <utilities/logger.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -125,11 +124,11 @@ ConStatus_t Connection::ReceiveFromSocket(int socket_fd, char* rcv_buffer, int r
         bzero(rcv_buffer, rcv_buffer_len);
         received = read(socket_fd, rcv_buffer, rcv_buffer_len);
         if (received < 0) {
-            logPrintf(LogLevel::ERROR, "ERROR reading from socket\n");
+            logger_m.Log(LogLevel::ERROR, "ERROR reading from socket\n");
             return TCP_ERROR_READ_FROM_SOCKET;
         }
     } else {
-        logPrintf(LogLevel::ERROR, "ERROR no socket to receive from\n");
+        logger_m.Log(LogLevel::ERROR, "ERROR no socket to receive from\n");
         return TCP_ERROR_WRONG_SOCKET;
     }
 
@@ -140,12 +139,12 @@ ConStatus_t Connection::SendToSocket(int socket_fd, const char* send_buffer, int
     if (socket_fd >= 0) {
         sent = write(socket_fd, send_buffer, send_buffer_len);
         if (sent < 0) {
-            logPrintf(LogLevel::ERROR, "ERROR writing to socket\n");
+            logger_m.Log(LogLevel::ERROR, "ERROR writing to socket\n");
             return TCP_ERROR_WRITE_TO_SOCKET;
         }
         return TCP_NO_ERROR;
     } else {
-        logPrintf(LogLevel::ERROR, "ERROR no socket to write\n");
+        logger_m.Log(LogLevel::ERROR, "ERROR no socket to write\n");
         return TCP_ERROR_WRONG_SOCKET;
     }
 }

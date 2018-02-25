@@ -16,7 +16,9 @@ namespace tcp
 
 class Client : private Connection {
 public:
-    Client(std::string& address, const int port) : Connection(port), server_address_m(address) {}
+    Client(std::string& address, const int port, utils::Logger& logger)
+        : Connection(port, logger)
+        , server_address_m(address) {}
     ~Client(void) {}
 
     ConStatus_t Connect(void);

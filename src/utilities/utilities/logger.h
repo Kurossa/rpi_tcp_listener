@@ -1,5 +1,5 @@
 /*
- * app_logger.hpp
+ * logger.h
  *
  *  Created on: Feb 2, 2016
  *      Author: Kurossa
@@ -10,19 +10,12 @@
 
 #include <cstdio>
 #include <cstdint>
+#include <mutex>
 
+//TODO: create real logger class
+//TODO: add logger tests
 namespace utils
 {
-
-const uint16_t MAX_LOG_LINE_NUM     = 10000; //Max line number of a single file
-const uint16_t MAX_LOG_FILE_NUM     = 99;
-const uint16_t MAX_LOG_FILES        = 5;
-const uint16_t LOG_BUF_LEN          = 256;
-const uint16_t LOG_MSG_LEN          = 128;
-const uint16_t LOG_FILENAME_LEN     = 64;
-const uint16_t LOG_DATE_LEN         = 32;
-const uint16_t LOG_MODULE_LEN       = 16;
-const uint16_t LOG_MAX_LEVEL_NAME   = 8;
 
 enum LogLevel {
     INFO,
@@ -32,12 +25,32 @@ enum LogLevel {
     MAX_LEVEL
 };
 
-//extern FILE *pLogFile_g; /* Log file handler */
-int logInit();
-void logPrintf(int level, const char* format, ...);
-void logClose();
-void logSetVerboseMode(bool value);
-void logSetLogToFile(bool value);
+class Logger
+{
+public:
+    Logger(bool log_to_file = false, bool verbose_mode = false);
+    ~Logger();
+
+    void Log(int level, const char* format, ...);
+
+private:
+    void CreateLogFile();
+    void CloseLogFile();
+    bool RenameAndStoreLogFile();
+    bool RemoveLogs();
+
+    std::mutex log_mutex_m;
+    bool verbose_mode_m;
+    bool write_to_file_m;
+
+    FILE * file_m = nullptr;
+    char dir_name_m[1024];
+    char log_dir_name_m[1024];
+    char log_file_name_m[1024];
+    unsigned int file_count_m;
+    unsigned int line_count_m;
+
+};
 
 } //namespace utils
 

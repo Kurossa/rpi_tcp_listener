@@ -26,21 +26,21 @@ int stop_proccess_g = 0;
 // Main additional functions
 static void SignalInterruptHandler(int signo) {
     if (signo == SIGINT) {
-        logPrintf(LogLevel::SCREEN, "Interrupting application.\n");
+        printf("Interrupting application.\n");
         stop_proccess_g = 1;
     } else if (signo == SIGTERM) {
-        logPrintf(LogLevel::SCREEN, "Terminating application.\n");
+        printf("Terminating application.\n");
         stop_proccess_g = 1;
     }
 }
 
 void InitSignalInterruptHandler() {
     if (signal(SIGINT, SignalInterruptHandler) == SIG_ERR) {
-        logPrintf(LogLevel::SCREEN, "Cannot handle SIGINT \n");
+        printf("Cannot handle SIGINT \n");
     }
 
     if (signal(SIGTERM, SignalInterruptHandler) == SIG_ERR) {
-        logPrintf(LogLevel::SCREEN, "Cannot handle SIGTERM \n");
+        printf("Cannot handle SIGTERM \n");
     }
 }
 
@@ -53,18 +53,18 @@ void PrintUsage(char* appName) {
 }
 
 // Parse main arguments
-void ParseArgs(int argc, char** argv)
+void ParseArgs(bool& log_to_file, bool& log_verbose, int argc, char** argv)
 {
     int option = 0;
     while ((option = getopt(argc, argv, "vlh")) != -1) {
         switch (option) {
         case 'v':
             printf("Running in verbose mode\n");
-            logSetVerboseMode(true);
+            log_verbose = true;
             break;
         case 'l':
             printf("Logging to file\n");
-            logSetLogToFile(true);
+            log_to_file = true;
             break;
         case 'h':
             PrintUsage(argv[0]);
@@ -81,39 +81,41 @@ void ParseArgs(int argc, char** argv)
 
 // Main loop
 int main(int argc, char** argv) {
-    printf("Starting %s.\n", argv[0]);
-
-    // Parse main arguments
-    ParseArgs(argc, argv);
-
     // Flush stdout buffer immediately
     setbuf(stdout, NULL);
+    printf("Starting %s.\n", argv[0]);
 
-    // Initialize logger
-    logInit();
+
+    // Parse main arguments
+    bool  log_to_file = false, log_verbose = false;
+    ParseArgs(log_to_file, log_verbose, argc, argv);
+    utils::Logger logger(log_to_file, log_verbose);
+
+    // Innitialize signal handlers
     InitSignalInterruptHandler();
-    logPrintf(LogLevel::SCREEN, "Starting application.\n");
+    logger.Log(LogLevel::SCREEN, "Starting application.\n");
 
     // Configuration Manager
-    config::ConfigManager config_manager;
-    if (config::OK == config_manager.ParseConfigFile(config_file_g)) {
+    config::ConfigManager config_manager(logger);
+    if (config::MISSING_FIELDS_IN_CONFIG >= config_manager.ParseConfigFile(config_file_g)) {
         config::Configuration app_config = config_manager.GetConfig();
-        logPrintf(LogLevel::SCREEN, "Configuration done.\n");
+        logger.Log(LogLevel::SCREEN, "Configuration done.\n");
 
-        // TCP Connection
-        tcp::Server server = tcp::Server( app_config.port);
+        // Change network ip/mask/gateway if other than in confige file
         tcp::ChangeIp(  std::string(network_interface_g)
                       , app_config.ip_str
                       , app_config.mask_str
                       , app_config.gateway_str);
-        usleep(500000);
+
+        // TCP Connection
+        tcp::Server server = tcp::Server(app_config.port, logger);
         server.Connect();
-        logPrintf(LogLevel::SCREEN, "TCP server start.\n");
+        logger.Log(LogLevel::SCREEN, "TCP server started.\n");
 
         // Communication
         char cmdMsg[tcp::BUFFER_SIZE];
         char replyMsg[tcp::BUFFER_SIZE];
-        Communication communication(config_manager);
+        Communication communication(config_manager, logger);
 
         // server loop
         while (0 == stop_proccess_g) {
@@ -124,18 +126,14 @@ int main(int argc, char** argv) {
                 communication.handleCommand(cmdMsg, replyMsg);
                 server.Send(replyMsg, strlen(replyMsg), sentBytes);
             }
-
-            //printf("mqSend size = %d, mqReply size = %d\n", mqSend.size(), mqReply.size());
             //printf("Received = %d, Sent = %d\n", recvdBytes, sentBytes);
         }
-        logPrintf(LogLevel::SCREEN, "Sound server stop.\n");
         server.Disconnect();
-        logPrintf(LogLevel::SCREEN, "TCP server stop.\n");
+        logger.Log(LogLevel::SCREEN, "TCP server stop.\n");
     } else {
-        logPrintf(LogLevel::ERROR, "Configuration Failed.\n");
+        logger.Log(LogLevel::ERROR, "Configuration Failed.\n");
     }
 
-    logPrintf(LogLevel::SCREEN, "End application.\n");
-    logClose();
+    logger.Log(LogLevel::SCREEN, "End application.\n");
     return 0;
 }

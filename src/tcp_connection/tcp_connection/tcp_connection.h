@@ -8,6 +8,7 @@
 #ifndef TCP_CONNECTION_TCP_CONNECTION_H_
 #define TCP_CONNECTION_TCP_CONNECTION_H_
 
+#include <utilities/logger.h>
 #include <netinet/in.h>
 #include <string>
 
@@ -45,7 +46,9 @@ ConStatus_t ChangeIp(  const std::string& interface
 
 class Connection {
 public:
-    Connection(const int port) : port_m(port) {}
+    Connection(const int port, utils::Logger& logger)
+        : port_m(port)
+        , logger_m(logger) {}
     ~Connection(void) {}
 
     ConStatus_t CreateSocket(void);
@@ -57,7 +60,7 @@ protected:
     int conn_socket_fd_m = -1;
     struct sockaddr_in my_addr_m;
     const int port_m = 0;
-
+    utils::Logger& logger_m;
 };
 
 } // namespace tcp

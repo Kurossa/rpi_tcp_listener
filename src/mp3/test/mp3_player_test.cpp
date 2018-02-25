@@ -2,6 +2,7 @@
 
 #include <mp3/mp3_player.h>
 
+//TODO: Add real mp3 player tests
 TEST (Mp3PlayerTest, DISABLED_PlayStopState) {
 
     mp3player::Mp3Player mp3_player;

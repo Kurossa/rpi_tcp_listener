@@ -6,7 +6,6 @@
  */
 
 #include "communication.h"
-#include <utilities/logger.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,7 +18,7 @@ void Communication::handleCommand(char* cmdMsg, char* replyMsg) {
     msg_parser_m.ParseMsg(cmdMsg, strlen(cmdMsg));
     utils::GetTime(time_str_m);
     command_m = msg_parser_m.GetMsgCommand();
-    logPrintf(LogLevel::SCREEN, "Received %d command\n", command_m);
+    logger_m.Log(LogLevel::SCREEN, "Received %d command\n", command_m);
 
     switch (command_m) {
     case TCP_SET_TIME:
@@ -109,7 +108,7 @@ void Communication::handleVolume(char* replyMsg) {
 }
 
 void Communication::handleReset(char* replyMsg) {
-    logPrintf(LogLevel::SCREEN, "system reboot!\n");
+    logger_m.Log(LogLevel::SCREEN, "system reboot!\n");
     system("reboot");
     //TODO: Add stopping application.
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), ERROR_CODE_OK);

@@ -9,67 +9,66 @@
 #include <stdarg.h>
 #include <string.h>
 #include <time.h>
-#include <assert.h>
-//#include <math.h>
-//#include <pthread.h>
-//#include <sys/types.h>
+#include <cassert>
 #include <dirent.h>
 #include <iostream>
 #include <set>
 #include <sys/stat.h>
 #include <sys/time.h>
-//#include <stdlib.h>
 
 using namespace utils;
 
-static FILE * pLogFile_s = NULL;
-static char pDirName_s[] = "log/";
-static char pLogDirName_s[128] = "";
-static char pLogFileName_s[] = "log";
-static unsigned int LogFileNum_s = 0;
-static unsigned int LogLineCount_s = 0;
+namespace
+{
 
-//const char KNRM[] =  "\x1B[0m";
-#define KNRM  "\x1B[0m"
-#define KRED  "\x1B[31m"
-#define KGRN  "\x1B[32m"
-#define KYEL  "\x1B[33m"
-#define KBLU  "\x1B[34m"
-#define KMAG  "\x1B[35m"
-#define KCYN  "\x1B[36m"
-#define KWHT  "\x1B[37m"
+// Define colors in terminal;
+const char KNRM[] = "\x1B[0m";
+const char KRED[] = "\x1B[31m";
+const char KGRN[] = "\x1B[32m";
+const char KYEL[] = "\x1B[33m";
+const char KBLU[] = "\x1B[34m";
+const char KMAG[] = "\x1B[35m";
+const char KCYN[] = "\x1B[36m";
+const char KWHT[] = "\x1B[37m";
 
-static pthread_mutex_t logMutex_s;
-static bool log_verbose_mode_s = false;
-static bool log_write_to_file_s = false;
+// Log level string
+const char log_level_str[LogLevel::MAX_LEVEL][16] = { "INF", "WAR", "ERR", "INF" };
+const size_t name_len           = 1024;
+const size_t msg_len            = 512;
+const size_t max_log_file_num   = 99;
+const size_t max_log_line_num   = 10000;
+const size_t max_log_files      = 5;
 
-/* Log level */
-static char s_acLevel[LogLevel::MAX_LEVEL][LOG_MAX_LEVEL_NAME] = { "INF", "WAR", "ERR", "INF" };
-
-static void logGetCompactTimestamp(char *pStrBuf) {
+bool GetCompactTimestamp(char *pStrBuf) {
     time_t now;
     struct tm *tm_now;
 
     if (NULL == pStrBuf) {
-        return;
+        return false;
     }
 
     time(&now);
     tm_now = localtime(&now);
-    sprintf(pStrBuf, "%d%02d%02d%02d%02d%02d", tm_now->tm_year + 1900, tm_now->tm_mon + 1, tm_now->tm_mday, tm_now->tm_hour, tm_now->tm_min,
-            tm_now->tm_sec);
-    return;
+    sprintf(pStrBuf, "%d%02d%02d%02d%02d%02d"
+            , tm_now->tm_year + 1900
+            , tm_now->tm_mon + 1
+            , tm_now->tm_mday
+            , tm_now->tm_hour
+            , tm_now->tm_min
+            , tm_now->tm_sec);
+
+    return true;
 }
 
 /* Timestamp for log message (loose format) */
-static void logGetTimestamp(char *pStrBuf) {
+bool GetTimestamp(char *pStrBuf) {
     time_t now;
     struct tm *tm_now;
     struct timeval tm_timeval;
     long usec;
 
     if (NULL == pStrBuf) {
-        return;
+        return false;
     }
 
     time(&now);
@@ -77,193 +76,219 @@ static void logGetTimestamp(char *pStrBuf) {
     gettimeofday(&tm_timeval, NULL);
     usec = (tm_timeval.tv_usec)/1000;
 
-    sprintf(pStrBuf, "%d-%02d-%02d %02d:%02d:%02d,%03ld", tm_now->tm_year + 1900, tm_now->tm_mon + 1, tm_now->tm_mday, tm_now->tm_hour,
-            tm_now->tm_min, tm_now->tm_sec, usec);
+    sprintf(pStrBuf, "%d-%02d-%02d %02d:%02d:%02d,%03ld"
+            , tm_now->tm_year + 1900
+            , tm_now->tm_mon + 1
+            , tm_now->tm_mday
+            , tm_now->tm_hour
+            , tm_now->tm_min
+            , tm_now->tm_sec
+            , usec);
 
-    return;
+    return true;
+}
+
 }
 
 /* Log rotate: add time stamps to log file name, so each log file will be different from the others */
-static int logChange() {
-    int iRet = -1;
+bool Logger::RenameAndStoreLogFile()
+{
+    char date[msg_len];
+    char next_file_name[name_len];
+    char prev_file_name[name_len];
 
-    char acDate[LOG_DATE_LEN + 1];
-    char acFileNameNew[LOG_FILENAME_LEN + 1];
-    char acFileNameOld[LOG_FILENAME_LEN + 1];
+    memset(date, 0x00, msg_len);
+    GetCompactTimestamp(date);
 
-    memset(acDate, 0x00, LOG_DATE_LEN + 1);
-    logGetCompactTimestamp(acDate);
+    memset(prev_file_name, 0x00, name_len);
+    sprintf(prev_file_name, "%s%s.txt", log_dir_name_m, log_file_name_m);
 
-    memset(acFileNameOld, 0x00, LOG_FILENAME_LEN + 1);
-    sprintf(acFileNameOld, "%s%s.txt", pLogDirName_s, pLogFileName_s);
+    memset(next_file_name, 0x00, name_len);
+    sprintf(next_file_name, "%s%s_%s_%02d.txt", log_dir_name_m, log_file_name_m, date, file_count_m);
 
-    memset(acFileNameNew, 0x00, LOG_FILENAME_LEN + 1);
-    sprintf(acFileNameNew, "%s%s_%s_%02d.txt", pLogDirName_s, pLogFileName_s, acDate, LogFileNum_s);
-
-    iRet = rename(acFileNameOld, acFileNameNew);
-    if (0 != iRet) {
-        printf("Error, failed to call rename %s to %s.\n", acFileNameOld, acFileNameNew);
-        return -1;
+    int result = rename(prev_file_name, next_file_name);
+    if (0 != result)
+    {
+        printf("Error, failed to call rename %s to %s.\n", prev_file_name, next_file_name);
+        return false;
     }
 
     /* Log file number threshold checking */
-    if (LogFileNum_s > MAX_LOG_FILE_NUM) {
+    if (file_count_m > max_log_file_num)
+    {
+        assert(0);
         printf("Error, log file number too high.\n");
     }
 
-    return 0;
+    return true;
 }
 
-static void logRemoveLogs(void) {
-    unsigned char isFile = 0x8;
-    std::set<std::string> logFileNames;
+bool Logger::RemoveLogs()
+{
+    unsigned char is_file = 0x8;
+    std::set<std::string> log_file_names;
     DIR *dp;
     struct dirent *dirp;
-    if((dp  = opendir(pLogDirName_s)) == NULL) {
-        printf("[ERROR]LOG_Init: Failed to read folder %s\n", pLogDirName_s);
-        return;
+
+    if((dp  = opendir(log_dir_name_m)) == NULL)
+    {
+        printf("[ERROR]LOG_Init: Failed to read folder %s\n", log_dir_name_m);
+        return false;
     }
 
-    while ((dirp = readdir(dp)) != NULL) {
-        if (dirp->d_type == isFile) {
-            char fileName[128] = {0};
-            strcat(fileName,pLogDirName_s);
-            strcat(fileName,dirp->d_name);
-            logFileNames.insert(fileName);
+    while ((dirp = readdir(dp)) != NULL)
+    {
+        if (dirp->d_type == is_file)
+        {
+            char file_name[name_len] = {0};
+            strcat(file_name, log_dir_name_m);
+            strcat(file_name, dirp->d_name);
+            log_file_names.insert(file_name);
         }
     }
 
-    std::set<std::string>::iterator it = logFileNames.begin();
-    for (int i = 0; i < ((int)logFileNames.size() - MAX_LOG_FILES + 1); ++i, ++it) {
+    std::set<std::string>::iterator it = log_file_names.begin();
+    int num_files_to_remove = log_file_names.size() - max_log_files + 1;
+    for (int i = 0; i < num_files_to_remove; ++i, ++it)
+    {
         printf("LOG FILE: %s\n",it->c_str());
         remove(it->c_str());
     }
-
     closedir(dp);
+
+    return true;
 }
 
-void utils::logSetVerboseMode(bool value) {
-    log_verbose_mode_s = value;
+Logger::Logger(bool log_to_file, bool verbose_mode) :
+    verbose_mode_m(verbose_mode)
+  , write_to_file_m(log_to_file)
+  , file_m(nullptr)
+  , dir_name_m("log/")
+  , log_file_name_m("log")
+  , file_count_m(0)
+  , line_count_m(0)
+{
+    CreateLogFile();
 }
 
-void utils::logSetLogToFile(bool value) {
-    log_write_to_file_s = value;
+Logger::~Logger()
+{
+    CloseLogFile();
+    if (write_to_file_m)
+    {
+        RenameAndStoreLogFile();
+    }
 }
 
-int utils::logInit() {
-    //log_verbose_mode_s
-    //log_write_to_file_s
-    if (log_write_to_file_s) {
-        char acFileFullName[LOG_FILENAME_LEN + 1];
-        int iRet = -1;
-
-        sprintf(pLogDirName_s, "%s/%s", getenv("HOME"), pDirName_s);
+void Logger::CreateLogFile()
+{
+    if (write_to_file_m)
+    {
+        char full_filename[name_len];
+        sprintf(log_dir_name_m, "%s/%s", getenv("HOME"), dir_name_m);
 
         struct stat sb;
-        if (!stat(pLogDirName_s, &sb) == 0 || !S_ISDIR(sb.st_mode)) {
-            mkdir(pLogDirName_s, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        if (!stat(log_dir_name_m, &sb) == 0 || !S_ISDIR(sb.st_mode)) {
+            mkdir(log_dir_name_m, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
         }
 
-        logRemoveLogs();
+        RemoveLogs();
 
         /* Check folder existing */
-        memset(acFileFullName, 0x00, LOG_FILENAME_LEN + 1);
-        sprintf(acFileFullName, "%s%s.txt", pLogDirName_s, pLogFileName_s);
-        pLogFile_s = fopen(acFileFullName, "w+");
-        if (NULL == pLogFile_s) {
-            printf("[ERROR]LOG_Init: Failed to open file %s.\n", acFileFullName);
-            return -1;
+        memset(full_filename, 0x00, name_len);
+        sprintf(full_filename, "%s%s.txt", log_dir_name_m, log_file_name_m);
+        file_m = fopen(full_filename, "w+");
+        if (NULL == file_m) {
+            printf("[ERROR]LOG_Init: Failed to open file %s.\n", full_filename);
+            write_to_file_m = false;
         }
-
-        /* Mutex lock initialize */
-        iRet = pthread_mutex_init(&logMutex_s, NULL);
-        if (0 != iRet) {
-            printf("[ERROR]LOG_Init: Failed to call pthread_mutex_init()\n");
-            return -1;
+        else
+        {
+            line_count_m = 0;
+            ++file_count_m;
+            file_count_m %= max_log_files;
         }
-
-        LogLineCount_s = 0;
-        ++LogFileNum_s;
-        LogFileNum_s %= MAX_LOG_FILE_NUM;
     }
-
-    return 0;
 }
 
-void utils::logPrintf(int iLevel, const char* pStrFormat, ...) {
-    if(!log_write_to_file_s && !log_verbose_mode_s) {
+void Logger::CloseLogFile()
+{
+    if (write_to_file_m)
+    {
+        if (NULL == file_m)
+        {
+            return;
+        }
+
+        fclose(file_m);
+        file_m = NULL;
+    }
+}
+
+
+void Logger::Log(int iLevel, const char* pStrFormat, ...)
+{
+    /* Parameters check */
+    if(!write_to_file_m && !verbose_mode_m) {
         return;
     }
 
-    char acMsg[LOG_MSG_LEN + 1];
-    char acDate[LOG_DATE_LEN + 1];
-    char acBuf[LOG_BUF_LEN + 1];
+    if (iLevel >= LogLevel::MAX_LEVEL) {
+        assert(0);
+        return;
+    }
+
+    char acMsg[msg_len + 1];
+    char acDate[msg_len + 1];
+    char acBuf[msg_len + 1];
 
     va_list list;
     va_start(list, pStrFormat);
 
-    /* Parameters check */
-    if (iLevel >= LogLevel::MAX_LEVEL) {
-        assert(0);
-    }
-
     /* Get message content */
-    memset(acMsg, 0x00, LOG_MSG_LEN + 1);
-    vsnprintf(acMsg, LOG_BUF_LEN + 1, pStrFormat, list);
+    memset(acMsg, 0x00, msg_len + 1);
+    vsnprintf(acMsg, msg_len + 1, pStrFormat, list);
+
+    va_end(list);
 
     /* Get time stamp */
-    memset(acDate, 0x00, LOG_DATE_LEN + 1);
-    logGetTimestamp(acDate);
+    memset(acDate, 0x00, msg_len + 1);
+    GetTimestamp(acDate);
 
     /* Format log messages to write to file */
     memset(acBuf, 0x00, sizeof(acBuf));
-    sprintf(acBuf, "%s [%s]: %s", acDate, s_acLevel[iLevel], acMsg);
+    sprintf(acBuf, "%s [%s]: %s", acDate, log_level_str[iLevel], acMsg);
 
 
-    if (log_verbose_mode_s) {
-        /* Output the error message directly to screen. */
-        if (iLevel == LogLevel::ERROR) {
-            printf("%s%s%s\r", KRED,acBuf,KNRM);
-        } else if (iLevel == LogLevel::SCREEN) {
-            printf("%s%s%s\r", KGRN,acBuf,KNRM);
+    if (verbose_mode_m) {
+        std::lock_guard<std::mutex> lock(log_mutex_m);
+        switch (iLevel)
+        {
+        case LogLevel::ERROR:
+            /* Output the error message directly to screen. */
+            printf("%s%s%s\r", KRED, acBuf, KNRM);
+            break;
+        case LogLevel::SCREEN:
+            printf("%s%s%s\r", KGRN, acBuf, KNRM);
+            break;
+        default:
+            break;
         }
     }
-    if (log_write_to_file_s) {
-        pthread_mutex_lock(&logMutex_s);
+
+    if (write_to_file_m) {
+        std::lock_guard<std::mutex> lock(log_mutex_m);
 
         /* Log file rotate, if the threshold (maximum line number) reached */
-        if (LogLineCount_s >= MAX_LOG_LINE_NUM) {
-            fclose(pLogFile_s);
-            pLogFile_s = NULL;
-
-            logChange();
-            logInit();
+        if (line_count_m >= max_log_line_num) {
+            CloseLogFile();
+            RenameAndStoreLogFile();
+            CreateLogFile();
         }
 
-        fputs(acBuf, pLogFile_s);
-        fflush(pLogFile_s);
-        LogLineCount_s++;
-
-        pthread_mutex_unlock(&logMutex_s);
+        fputs(acBuf, file_m);
+        fflush(file_m);
+        line_count_m++;
     }
-
-    va_end(list);
-    return;
-}
-
-void utils::logClose() {
-    if (log_write_to_file_s) {
-        if (NULL == pLogFile_s) {
-            return;
-        }
-
-        fclose(pLogFile_s);
-        pLogFile_s = NULL;
-
-        logChange();
-
-        pthread_mutex_destroy(&logMutex_s);
-    }
-    return;
 }
 

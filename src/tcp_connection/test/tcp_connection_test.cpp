@@ -37,7 +37,7 @@ private:
     bool ready_m = false;
     std::mutex mu_m;
     std::condition_variable cv_m;
-
+    utils::Logger logger_m;
 };
 
 void TcpConnection::ServerThread(int port, std::promise<std::string> && pr)
@@ -45,7 +45,7 @@ void TcpConnection::ServerThread(int port, std::promise<std::string> && pr)
     char rcv_from_client[tcp::BUFFER_SIZE] = {0};
     int sent = 0, received = 0;
 
-    tcp::Server tcp_server(port);
+    tcp::Server tcp_server(port, logger_m);
     tcp_server.Connect();
 
     // Communicate client that server is ready.
@@ -75,7 +75,7 @@ void TcpConnection::ClientThread(  std::string test_string
     char rcv_from_server[tcp::BUFFER_SIZE] = {0};
     int sent = 0, received = 0;
 
-    tcp::Client tcp_client(server_address, port);
+    tcp::Client tcp_client(server_address, port, logger_m);
     tcp_client.Connect();
     tcp_client.Send(test_string.c_str(), test_string.length(), sent);
     tcp_client.Receive(rcv_from_server, tcp::BUFFER_SIZE, received);
@@ -121,7 +121,7 @@ std::string TcpConnection::ServerTask(int port)
     char rcv_from_client[tcp::BUFFER_SIZE] = {0};
     int sent = 0, received = 0;
 
-    tcp::Server tcp_server(port);
+    tcp::Server tcp_server(port, logger_m);
     tcp_server.Connect();
 
     // Communicate client that server is ready.
@@ -150,7 +150,7 @@ std::string TcpConnection::ClientTask(  std::string test_string
     char rcv_from_server[tcp::BUFFER_SIZE] = {0};
     int sent = 0, received = 0;
 
-    tcp::Client tcp_client(server_address, port);
+    tcp::Client tcp_client(server_address, port, logger_m);
     tcp_client.Connect();
     tcp_client.Send(test_string.c_str(), test_string.length(), sent);
     tcp_client.Receive(rcv_from_server, tcp::BUFFER_SIZE, received);

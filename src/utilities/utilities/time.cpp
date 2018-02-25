@@ -1,12 +1,11 @@
 /*
- * app_time.cpp1900
+ * time.cpp
  *
  *  Created on: Apr 25, 2016
- *      Author: mariusz
+ *      Author: Kurossa
  */
-#include "time.h"
-#include <utilities/logger.h>
 
+#include "time.h"
 #include <stdlib.h>
 #include <sys/time.h>
 #include <cctype>
@@ -79,10 +78,11 @@ eTimeStatus_t utils::SetTime(const std::string& time_string) {
         tm_ptr->tm_year = atoi(time_string.substr(15, 4).c_str())-1900;
 
         const struct timeval tv = { mktime(tm_ptr), 0 };
-        int time_status = settimeofday(&tv, 0);
-        logPrintf(LogLevel::SCREEN, "Set time: %02d:%02d:%02d_%02d.%02d.%04d, status = %d\n",tm_ptr->tm_hour, tm_ptr->tm_min, tm_ptr->tm_sec, tm_ptr->tm_mday, tm_ptr->tm_mon+1, tm_ptr->tm_year + 1900, time_status);
-
-        return TIME_SET_OK;
+        int success = settimeofday(&tv, 0);
+        if (0 == success )
+        {
+            return TIME_SET_OK;
+        }
     }
     return TIME_NOK;
 }

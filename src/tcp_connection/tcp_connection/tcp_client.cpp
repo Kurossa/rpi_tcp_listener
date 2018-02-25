@@ -7,7 +7,6 @@
 
 #include "tcp_client.h"
 
-#include <utilities/logger.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <string.h>
