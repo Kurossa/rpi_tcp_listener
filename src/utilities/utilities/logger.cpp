@@ -33,7 +33,7 @@ const char KWHT[] = "\x1B[37m";
 
 // Log level string
 const char log_level_str[LogLevel::MAX_LEVEL][16] = { "INF", "WAR", "ERR", "INF" };
-const size_t name_len           = 1024;
+const size_t name_len           = 3072;
 const size_t msg_len            = 512;
 const size_t max_log_file_num   = 99;
 const size_t max_log_line_num   = 10000;
