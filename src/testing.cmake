@@ -1,7 +1,7 @@
 include(CTest)
 enable_testing()
 
-add_subdirectory(ext/googletest-1.7.0/gmock)
+add_subdirectory(ext/googletest-1.8.1/googlemock)
 include_directories(${gtest_SOURCE_DIR}/include
 					${gmock_SOURCE_DIR}/include)
 
