@@ -38,6 +38,7 @@ Mp3Player::Mp3Player():
     state_m.reset(new PlayerStopState(*this));
     auto_stop_thread_m = std::thread(&Mp3Player::DoStop, this);
 }
+
 Mp3Player::~Mp3Player()
 {
     Stop();
@@ -81,13 +82,13 @@ Status Mp3Player::SetVolume(uint16_t volume)
     return state_m->SetVolume(volume);
 }
 
-State Mp3Player::GetPlayMode()
+State Mp3Player::GetState()
 {
     lock_guard<mutex> lock(state_mutex_m);
     return state_m->GetState();
 }
 
-std::string Mp3Player::GetPlayModeStr()
+std::string Mp3Player::GetStateStr()
 {
     lock_guard<mutex> lock(state_mutex_m);
     return state_m->GetStateStr();
@@ -115,9 +116,23 @@ bool Mp3Player::OpenPlayer(std::string& file_name)
     int channels = 0, encoding = 0;
     long rate = 0;
 
-    //TODO: Add chcecking if file exists or can be open by mpg123
+    // Test file if exists
+    FILE* source = fopen(file_name.c_str(), "rb");
+    if (source) {
+        fclose(source);
+    } else {
+        // File not found or file corrupted
+        return false;
+    }
+
+    // Open file using mpg123
     int status = mpg123_open(mh_m, file_name.c_str());
-    printf("Opening file status: %d\n",status);
+    //printf("Opening file status: %d\n",status);
+    if (status != 0) {
+        // File not possible to open by mpg123
+        return false;
+    }
+
     mpg123_getformat(mh_m, &rate, &channels, &encoding);
 
     // Initialize ao_driver
@@ -138,7 +153,6 @@ bool Mp3Player::OpenPlayer(std::string& file_name)
     float volume_float = volume_m / 100.0;
     mpg123_volume(mh_m, volume_float);
 
-    //FIXME: return real value
     return true;
 }
 
@@ -231,6 +245,7 @@ void Mp3Player::DoPlay(std::string file_name, PlayMode play_mode)
         if(!stop_loop && file_played_n_times < file_play_max_times)
         {
             ClosePlayer();
+            //TODO: Add checking if same file did not corrupt meanwhile.
             OpenPlayer(file_name);
         }
     }

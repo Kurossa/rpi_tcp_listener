@@ -39,8 +39,8 @@ TEST (UtilitiesTest, EnqueueDequeueRandomNumbers) {
         auto enqueue_task = std::async(std::launch::async, &EnqueueTask, std::ref(mq), test_queue_size);
         auto dequeue_task = std::async(std::launch::async, &DequeueTask, std::ref(mq), test_queue_size);
 
-        auto input_vector = enqueue_task .get();
-        auto output_vector = dequeue_task .get();
+        auto input_vector = enqueue_task.get();
+        auto output_vector = dequeue_task.get();
 
         EXPECT_THAT(input_vector, ::testing::ContainerEq(output_vector));
     }

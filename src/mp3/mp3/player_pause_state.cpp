@@ -25,6 +25,10 @@ Status PlayerPauseState::Play(std::string file_name, PlayMode play_mode)
     printf("Pause state, stop prev play and play new file: %s\n", file_name.c_str());
     mp3_player_m.ClosePlayer();
     mp3_player_m.OpenPlayer(file_name);
+    {
+        mp3_player_m.SetState(new PlayerStopState(mp3_player_m));
+        return Status::FILE_NOT_FOUND;
+    }
     mp3_player_m.SetState(new PlayerPlayState(mp3_player_m, file_name, play_mode));
     return Status::SUCCESS;
 }

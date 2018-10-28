@@ -74,12 +74,12 @@ void Communication::handlePlay(char* replyMsg) {
     }
 
     mp3_player_m.Play(config_manager_m.GetConfig().sound_files.at(file_num).c_str(), play_mode);
-    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetPlayModeStr().c_str(), ERROR_CODE_OK);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_OK);
 }
 
 void Communication::handleStop(char* replyMsg) {
     mp3_player_m.Stop();
-    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetPlayModeStr().c_str(), ERROR_CODE_OK);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_OK);
 }
 
 void Communication::handleSetCfg(char* replyMsg) {
@@ -104,7 +104,7 @@ void Communication::handleVolume(char* replyMsg) {
 
     int volume = atoi(msg_parser_m.GetMsgStrAt(1).c_str());
     mp3_player_m.SetVolume(volume);
-    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetPlayModeStr().c_str(), ERROR_CODE_OK);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_OK);
 }
 
 void Communication::handleReset(char* replyMsg) {
@@ -115,6 +115,6 @@ void Communication::handleReset(char* replyMsg) {
 }
 
 void Communication::handleStatus(char* replyMsg) {
-    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetPlayModeStr().c_str(), ERROR_CODE_OK);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_OK);
 }
 

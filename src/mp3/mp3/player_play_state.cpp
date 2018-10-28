@@ -44,6 +44,10 @@ Status PlayerPlayState::Play(std::string file_name, PlayMode play_mode)
     mp3_player_m.StopPlayThread();
     mp3_player_m.ClosePlayer();
     mp3_player_m.OpenPlayer(file_name);
+    {
+        mp3_player_m.SetState(new PlayerStopState(mp3_player_m));
+        return Status::FILE_NOT_FOUND;
+    }
     mp3_player_m.RunPlayThread(file_name, play_mode);
     return Status::SUCCESS;
 }

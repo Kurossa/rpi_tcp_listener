@@ -39,8 +39,9 @@ public:
     Status Resume();
     Status Stop();
     Status SetVolume(uint16_t volume);
-    State GetPlayMode();
-    std::string GetPlayModeStr();
+    uint16_t GetVolume() const { return volume_m; }
+    State GetState();
+    std::string GetStateStr();
 
 private:
     void SetState(PlayerState* new_state);

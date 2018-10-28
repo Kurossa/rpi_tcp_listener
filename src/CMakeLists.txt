@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(rpi_tcp_listener_project VERSION 3.0 LANGUAGES CXX)
 
-add_definitions(-g -o0 -Wall -Wextra -Werror -pedantic -std=gnu++11)
+add_definitions(-Wall -Wextra -Werror -pedantic -std=gnu++11)
 
 add_subdirectory(app_rpi_tcp_listener)
 add_subdirectory(app_config)

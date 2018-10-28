@@ -52,15 +52,17 @@ public:
         ZIP_UNCOMPRESS
     };
 
-protected:
-    virtual void SetUp() {
-    }
-
-    virtual void TearDown() {
+    ZipTest() {}
+    ~ZipTest()
+    {
         RemoveFileIfExists(test_file_name_m);
         RemoveFileIfExists(output_file_name_m);
         RemoveFileIfExists(output2_file_name_m);
     }
+
+protected:
+    virtual void SetUp() {}
+    virtual void TearDown() {}
 
     void TestCompressUncompress(  const std::vector<char>& test_vector
                                 , const std::vector<char>& expected_result_vector

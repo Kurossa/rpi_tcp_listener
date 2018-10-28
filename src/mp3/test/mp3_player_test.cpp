@@ -1,80 +1,118 @@
 #include "gtest/gtest.h"
 
 #include <mp3/mp3_player.h>
-
-//TODO: Add real mp3 player tests
-TEST (Mp3PlayerTest, DISABLED_PlayStopState) {
-
+TEST (Mp3PlayerTest, OepnWrongFile)
+{
     mp3player::Mp3Player mp3_player;
-    mp3_player.Play("test.mp3", mp3player::PlayMode::ONCE);
-    mp3_player.SetVolume(100);
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-    mp3_player.SetVolume(50);
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-    mp3_player.SetVolume(100);
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-    mp3_player.SetVolume(50);
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-    mp3_player.Stop();
-    mp3_player.Stop();
-
-    printf("End of test!\n");
-    EXPECT_TRUE(true);
+    mp3_player.Play("wrong_file.mp3", mp3player::PlayMode::ONCE);
+    EXPECT_EQ(mp3player::State::STOPED , mp3_player.GetState());
 }
 
-TEST (Mp3PlayerTest, PlayPausePlayStopState) {
-
+TEST (Mp3PlayerTest, PlayAndOepnWrongFile)
+{
     mp3player::Mp3Player mp3_player;
     mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
+    mp3_player.Play("wrong_file.mp3", mp3player::PlayMode::ONCE);
+    EXPECT_EQ(mp3player::State::STOPED , mp3_player.GetState());
+}
+
+TEST (Mp3PlayerTest, PlayStopState)
+{
+    mp3player::Mp3Player mp3_player;
+    mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
+    mp3_player.Stop();
+    EXPECT_EQ(mp3player::State::STOPED , mp3_player.GetState());
+}
+
+TEST (Mp3PlayerTest, PlayAndWaitForEndState)
+{
+    mp3player::Mp3Player mp3_player;
+    mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
+    std::this_thread::sleep_for(std::chrono::milliseconds(750));
+    EXPECT_EQ(mp3player::State::STOPED , mp3_player.GetState());
+}
+
+TEST (Mp3PlayerTest, StopPauseResumeState)
+{
+    mp3player::Mp3Player mp3_player;
+    EXPECT_EQ(mp3player::State::STOPED , mp3_player.GetState());
+    mp3_player.Pause();
+    EXPECT_EQ(mp3player::State::STOPED , mp3_player.GetState());
+    mp3_player.Resume();
+    EXPECT_EQ(mp3player::State::STOPED , mp3_player.GetState());
+}
+
+TEST (Mp3PlayerTest, PlayResumeState)
+{
+    mp3player::Mp3Player mp3_player;
+    mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
+    mp3_player.Resume();
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
+}
+
+TEST (Mp3PlayerTest, PlayPauseResumeStopPlayState)
+{
+    mp3player::Mp3Player mp3_player;
+
+    mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
     mp3_player.Pause();
     mp3_player.SetVolume(70);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    EXPECT_EQ(mp3player::State::PAUSED , mp3_player.GetState());
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
-    //FIXME: Repair Resume stat, probably DoPlay read again file.
     mp3_player.Resume();
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
+    EXPECT_EQ(70, mp3_player.GetVolume());
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
     mp3_player.Stop();
+    EXPECT_EQ(mp3player::State::STOPED , mp3_player.GetState());
+
     mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
+}
 
+TEST (Mp3PlayerTest, ChangeVolume)
+{
+    mp3player::Mp3Player mp3_player;
     mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
 
-    printf("End of test!\n");
-    EXPECT_TRUE(true);
-}
+    mp3_player.SetVolume(100);
+    EXPECT_EQ(100, mp3_player.GetVolume());
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-TEST (Mp3PlayerTest, DISABLED_PlayStopStopState) {
+    mp3_player.SetVolume(75);
+    EXPECT_EQ(75, mp3_player.GetVolume());
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    mp3player::Mp3Player mp3_player;
-    mp3_player.Play("1.mp3", mp3player::PlayMode::ONCE);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    mp3_player.Play("2.mp3", mp3player::PlayMode::ONCE);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    mp3_player.SetVolume(25);
+    EXPECT_EQ(25, mp3_player.GetVolume());
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    mp3_player.SetVolume(100);
+    EXPECT_EQ(100, mp3_player.GetVolume());
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
     mp3_player.Stop();
-    mp3_player.Stop();
-
-    printf("End of test!\n");
-    EXPECT_TRUE(true);
+    EXPECT_EQ(mp3player::State::STOPED , mp3_player.GetState());
 }
 
-TEST (Mp3PlayerTest, DISABLED_PlayAndDestructPlayer) {
-
-    {
+TEST (Mp3PlayerTest, PlayAndDestructPlayer)
+{
+    EXPECT_NO_THROW
+    ({
     mp3player::Mp3Player mp3_player;
-    mp3_player.Play("1.mp3", mp3player::PlayMode::ONCE);
-    }
-    printf("End of test!\n");
-    EXPECT_TRUE(true);
+    mp3_player.Play("123.mp3", mp3player::PlayMode::ONCE);
+    EXPECT_EQ(mp3player::State::PLAY_ONCE , mp3_player.GetState());
+    });
 }
-TEST (Mp3PlayerTest, DISABLED_PlayAndWaitForEnd) {
-    mp3player::Mp3Player mp3_player;
-    mp3_player.Play("1.mp3", mp3player::PlayMode::ONCE);
-    std::this_thread::sleep_for(std::chrono::seconds(6));
-    printf("End of test!\n");
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    mp3_player.Stop();
-    EXPECT_TRUE(true);
-}

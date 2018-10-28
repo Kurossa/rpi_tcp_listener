@@ -75,7 +75,6 @@ TEST (TimeTest, GetSetTimeTest)
 {
     std::string time;
     EXPECT_EQ(utils::TIME_GET_OK, utils::GetTime(time));
-    //Note this execution will fail if not run as super-user / root
     EXPECT_EQ(utils::TIME_SET_OK, utils::SetTime(time));
 }
 

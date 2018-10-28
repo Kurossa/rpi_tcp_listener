@@ -1,5 +1,6 @@
 add_executable(util_time_test
-	util_time_test.cpp)
+    mock_util_time.cpp	
+    util_time_test.cpp)
 
 target_link_libraries(util_time_test
 	utilities
