@@ -42,6 +42,15 @@ Status PlayerPauseState::Pause()
 Status PlayerPauseState::Resume()
 {
     printf("Pause state, changing to Play state\n");
+    // Test file if exists
+    FILE* source = fopen(play_file_name_m.c_str(), "rb");
+    if (source) {
+        fclose(source);
+    } else {
+        // File not found or file corrupted
+        mp3_player_m.SetState(new PlayerStopState(mp3_player_m));
+        return Status::FILE_NOT_FOUND;
+    }
     mp3_player_m.SetState(new PlayerPlayState(mp3_player_m, play_file_name_m, play_mode_m));
     return Status::SUCCESS;
 }
