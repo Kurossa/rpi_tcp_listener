@@ -110,7 +110,8 @@ void Communication::handleReset(char* replyMsg) {
     logger_m.Log(LogLevel::SCREEN, "system reboot!\n");
     mp3_player_m.Stop();
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), ERROR_CODE_OK);
-    reboot_callback_m();
+    if (reboot_callback_m)
+        reboot_callback_m();
 }
 
 void Communication::handleStatus(char* replyMsg) {

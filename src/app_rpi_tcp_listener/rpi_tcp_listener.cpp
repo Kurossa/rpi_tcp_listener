@@ -36,14 +36,6 @@ static void SignalInterruptHandler(int signo) {
     }
 }
 
-// Reboot system
-void RebootSystem()
-{
-    printf("Stop application and reboot.\n");
-    stop_proccess_g = true;
-    reboot_system_g = true;
-}
-
 void InitSignalInterruptHandler() {
     if (signal(SIGINT, SignalInterruptHandler) == SIG_ERR) {
         printf("Cannot handle SIGINT \n");
@@ -52,6 +44,13 @@ void InitSignalInterruptHandler() {
     if (signal(SIGTERM, SignalInterruptHandler) == SIG_ERR) {
         printf("Cannot handle SIGTERM \n");
     }
+}
+
+// Reboot system
+void RebootSystem() {
+    printf("Stop application and reboot.\n");
+    stop_proccess_g = true;
+    reboot_system_g = true;
 }
 
 // Usage print
@@ -149,5 +148,6 @@ int main(int argc, char** argv) {
         logger.Log(LogLevel::SCREEN, "Rebooting system.\n");
         system("reboot");
     }
+
     return 0;
 }

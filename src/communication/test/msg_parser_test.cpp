@@ -68,7 +68,7 @@ TEST (MsgParserTest, StatusCommand) {
 
     EXPECT_EQ(MsgCmd::TCP_STATUS, msg_parser.GetMsgCommand());
     EXPECT_EQ(ParserStatus::OK, status);
-    EXPECT_EQ(2, static_cast<int>(msg_parser.GetMsgVectorSize()));
+    EXPECT_EQ(static_cast<size_t>(2), msg_parser.GetMsgVectorSize());
     EXPECT_STREQ("TCP_STATUS", msg_parser.GetMsgCommandStr().c_str());
 }
 
@@ -83,7 +83,7 @@ TEST (MsgParserTest, Play1stFileOnceCommand) {
     msg_parser.ParseMsg(msg_cmd.c_str(), msg_cmd.length());
 
     EXPECT_EQ(MsgCmd::TCP_PLAY, msg_parser.GetMsgCommand());
-    EXPECT_EQ(4, static_cast<int>(msg_parser.GetMsgVectorSize()));
+    EXPECT_EQ(static_cast<size_t>(4), msg_parser.GetMsgVectorSize());
     EXPECT_STREQ("TCP_PLAY", msg_parser.GetMsgCommandStr().c_str());
     EXPECT_STREQ("1", msg_parser.GetMsgAtributeNo(0).c_str());
     EXPECT_STREQ("ONCE", msg_parser.GetMsgAtributeNo(1).c_str());
@@ -98,7 +98,7 @@ TEST (MsgParserTest, StopCommand) {
     msg_parser.ParseMsg(msg_cmd.c_str(), msg_cmd.length());
 
     EXPECT_EQ(MsgCmd::TCP_STOP, msg_parser.GetMsgCommand());
-    EXPECT_EQ(2, static_cast<int>(msg_parser.GetMsgVectorSize()));
+    EXPECT_EQ(static_cast<size_t>(2), msg_parser.GetMsgVectorSize());
     EXPECT_STREQ("TCP_STOP", msg_parser.GetMsgCommandStr().c_str());
 }
 
@@ -112,7 +112,7 @@ TEST (MsgParserTest, SetTimeCommand) {
     msg_parser.ParseMsg(msg_cmd.c_str(), msg_cmd.length());
 
     EXPECT_EQ(MsgCmd::TCP_SET_TIME, msg_parser.GetMsgCommand());
-    EXPECT_EQ(3, static_cast<int>(msg_parser.GetMsgVectorSize()));
+    EXPECT_EQ(static_cast<size_t>(3), msg_parser.GetMsgVectorSize());
     EXPECT_STREQ("TCP_SET_TIME", msg_parser.GetMsgCommandStr().c_str());
     EXPECT_STREQ("12:12:12_01.01.1971", msg_parser.GetMsgAtributeNo(0).c_str());
 }
@@ -127,7 +127,7 @@ TEST (MsgParserTest, SetVolumeCommand) {
     msg_parser.ParseMsg(msg_cmd.c_str(), msg_cmd.length());
 
     EXPECT_EQ(MsgCmd::TCP_SET_VOLUME, msg_parser.GetMsgCommand());
-    EXPECT_EQ(3, static_cast<int>(msg_parser.GetMsgVectorSize()));
+    EXPECT_EQ(static_cast<size_t>(3), msg_parser.GetMsgVectorSize());
     EXPECT_STREQ("TCP_SET_VOLUME", msg_parser.GetMsgCommandStr().c_str());
     EXPECT_STREQ("20", msg_parser.GetMsgAtributeNo(0).c_str());
 }
@@ -164,7 +164,7 @@ TEST (MsgParserTest, SetCfgCommand) {
     msg_parser.ParseMsg(msg_cmd.c_str(), msg_cmd.length());
 
     EXPECT_EQ(MsgCmd::TCP_SET_CFG, msg_parser.GetMsgCommand());
-    EXPECT_EQ(4, static_cast<int>(msg_parser.GetMsgVectorSize()));
+    EXPECT_EQ(static_cast<size_t>(4), msg_parser.GetMsgVectorSize());
     EXPECT_STREQ("TCP_SET_CFG", msg_parser.GetMsgCommandStr().c_str());
     oss.str("");
     oss << config.length();
@@ -181,7 +181,7 @@ TEST (MsgParserTest, GetCfgCommand) {
     msg_parser.ParseMsg(msg_cmd.c_str(), msg_cmd.length());
 
     EXPECT_EQ(MsgCmd::TCP_GET_CFG, msg_parser.GetMsgCommand());
-    EXPECT_EQ(2, static_cast<int>(msg_parser.GetMsgVectorSize()));
+    EXPECT_EQ(static_cast<size_t>(2), msg_parser.GetMsgVectorSize());
     EXPECT_STREQ("TCP_GET_CFG", msg_parser.GetMsgCommandStr().c_str());
 }
 
@@ -194,6 +194,6 @@ TEST (MsgParserTest, ResetCommand) {
     msg_parser.ParseMsg(msg_cmd.c_str(), msg_cmd.length());
 
     EXPECT_EQ(MsgCmd::TCP_RESET, msg_parser.GetMsgCommand());
-    EXPECT_EQ(2, static_cast<int>(msg_parser.GetMsgVectorSize()));
+    EXPECT_EQ(static_cast<size_t>(2), msg_parser.GetMsgVectorSize());
     EXPECT_STREQ("TCP_RESET", msg_parser.GetMsgCommandStr().c_str());
 }
