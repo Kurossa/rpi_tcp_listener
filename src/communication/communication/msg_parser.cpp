@@ -103,13 +103,15 @@ std::string MsgParser::GetMsgAtributeNo(size_t index) const
 
 MsgCmd MsgParser::VerifyAndGetMsgCommand(void)
 {
-    if(0 == strcmp(parsed_masage_m.at(parsed_masage_m.size() - 1).c_str(), msg_command_end)) {
-        for (int command = 0; command < TCP_CMD_NUM; ++command) {
-            if (0 == strcmp(parsed_masage_m.at(0).c_str(), msg_commands[command])) {
-                if (msg_commands_nodes[command] != parsed_masage_m.size()) {
-                    return command_m = TCP_CMD_NUM;
+    if (parsed_masage_m.size()) {
+        if(0 == strcmp(parsed_masage_m.at(parsed_masage_m.size() - 1).c_str(), msg_command_end)) {
+            for (int command = 0; command < TCP_CMD_NUM; ++command) {
+                if (0 == strcmp(parsed_masage_m.at(0).c_str(), msg_commands[command])) {
+                    if (msg_commands_nodes[command] != parsed_masage_m.size()) {
+                        return command_m = TCP_CMD_NUM;
+                    }
+                    return command_m = static_cast<MsgCmd>(command);
                 }
-                return command_m = static_cast<MsgCmd>(command);
             }
         }
     }

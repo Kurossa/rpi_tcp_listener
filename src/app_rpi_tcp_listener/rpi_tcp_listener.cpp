@@ -10,9 +10,10 @@
 #include <tcp_connection/tcp_server.h>
 #include <communication/communication.h>
 #include <config_manager/config_manager.h>
-#include <signal.h>
+#include <csignal>
 #include <getopt.h>
 #include <cstring>
+#include <cstdlib>
 
 using namespace utils;
 using namespace comm;
@@ -21,17 +22,26 @@ using std::list;
 using std::vector;
 
 // Globals
-int stop_proccess_g = 0;
+bool stop_proccess_g = false;
+bool reboot_system_g = false;
 
 // Main additional functions
 static void SignalInterruptHandler(int signo) {
     if (signo == SIGINT) {
         printf("Interrupting application.\n");
-        stop_proccess_g = 1;
+        stop_proccess_g = true;
     } else if (signo == SIGTERM) {
         printf("Terminating application.\n");
-        stop_proccess_g = 1;
+        stop_proccess_g = true;
     }
+}
+
+// Reboot system
+void RebootSystem()
+{
+    printf("Stop application and reboot.\n");
+    stop_proccess_g = true;
+    reboot_system_g = true;
 }
 
 void InitSignalInterruptHandler() {
@@ -115,10 +125,10 @@ int main(int argc, char** argv) {
         // Communication
         char cmdMsg[tcp::BUFFER_SIZE];
         char replyMsg[tcp::BUFFER_SIZE];
-        Communication communication(config_manager, logger);
+        Communication communication(config_manager, logger, &RebootSystem);
 
         // server loop
-        while (0 == stop_proccess_g) {
+        while (!stop_proccess_g) {
             int recvdBytes, sentBytes;
             sprintf(replyMsg,"UNKNOWN_COMMAND\nEND\n");
 
@@ -135,5 +145,9 @@ int main(int argc, char** argv) {
     }
 
     logger.Log(LogLevel::SCREEN, "End application.\n");
+    if(reboot_system_g) {
+        logger.Log(LogLevel::SCREEN, "Rebooting system.\n");
+        system("reboot");
+    }
     return 0;
 }

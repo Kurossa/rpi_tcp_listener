@@ -4,6 +4,16 @@
 
 using namespace comm;
 
+TEST (MsgParserTest, EmptyCommand) {
+    // Empty Command:
+    // ""
+    MsgParser msg_parser;
+    std::string msg_cmd = "";
+    ParserStatus status = msg_parser.ParseMsg(msg_cmd.c_str(), msg_cmd.length());
+
+    EXPECT_EQ(ParserStatus::WRONG_MESSAGE, status);
+}
+
 TEST (MsgParserTest, WrongCommand) {
     // Wrong Command:
     // TCP_STATUS\n

@@ -6,9 +6,8 @@
  */
 
 #include "communication.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 
 using namespace utils;
 using namespace comm;
@@ -109,9 +108,9 @@ void Communication::handleVolume(char* replyMsg) {
 
 void Communication::handleReset(char* replyMsg) {
     logger_m.Log(LogLevel::SCREEN, "system reboot!\n");
-    system("reboot");
-    //TODO: Add stopping application.
+    mp3_player_m.Stop();
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), ERROR_CODE_OK);
+    reboot_callback_m();
 }
 
 void Communication::handleStatus(char* replyMsg) {

@@ -264,12 +264,16 @@ void Logger::Log(int iLevel, const char* pStrFormat, ...)
         std::lock_guard<std::mutex> lock(log_mutex_m);
         switch (iLevel)
         {
+        case LogLevel::WARNING:
+            /* Output the warning message directly to screen. */
+            printf("%s%s%s\n", KYEL, acBuf, KNRM);
+            break;
         case LogLevel::ERROR:
             /* Output the error message directly to screen. */
-            printf("%s%s%s\r", KRED, acBuf, KNRM);
+            printf("%s%s%s\n", KRED, acBuf, KNRM);
             break;
         case LogLevel::SCREEN:
-            printf("%s%s%s\r", KGRN, acBuf, KNRM);
+            printf("%s%s%s\n", KGRN, acBuf, KNRM);
             break;
         default:
             break;
