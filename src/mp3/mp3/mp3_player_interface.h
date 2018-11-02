@@ -42,6 +42,7 @@ enum State {
 enum Status {
     SUCCESS = 0,
     FILE_NOT_FOUND,
+    WRONG_PLAY_MODE,
     FAILED,
     STATUS_MAX
 };

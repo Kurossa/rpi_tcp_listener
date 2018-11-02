@@ -7,10 +7,8 @@
 		<port>9999</port>
 	</network>
 	<sounds>
-		<sound>file1</sound>
-		<sound>file2</sound>
-		<sound>file3</sound>
-		<sound>file4</sound>
+		<sound>123.mp3</sound>
+		<sound>123.mp3</sound>
 	</sounds>
 </audio_app_cfg>
 

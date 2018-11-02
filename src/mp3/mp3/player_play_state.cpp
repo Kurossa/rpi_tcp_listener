@@ -40,10 +40,15 @@ Status PlayerPlayState::Play(std::string file_name, PlayMode play_mode)
 {
     printf("Play state, stop prev play and play new file: %s\n", file_name.c_str());
     play_mode_m = play_mode;
+    if (play_mode >= PlayMode::PLAY_MODE_MAX)
+    {
+        mp3_player_m.SetState(new PlayerStopState(mp3_player_m));
+        return Status::WRONG_PLAY_MODE;
+    }
     play_file_name_m = file_name;
     mp3_player_m.StopPlayThread();
     mp3_player_m.ClosePlayer();
-    mp3_player_m.OpenPlayer(file_name);
+    if (!mp3_player_m.OpenPlayer(file_name))
     {
         mp3_player_m.SetState(new PlayerStopState(mp3_player_m));
         return Status::FILE_NOT_FOUND;

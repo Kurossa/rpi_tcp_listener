@@ -21,8 +21,10 @@ PlayerStopState::PlayerStopState(Mp3Player& mp3_player) : PlayerState(mp3_player
 Status PlayerStopState::Play(std::string file_name, PlayMode play_mode)
 {
     printf("Stop state, play file: %s\n", file_name.c_str());
-    if (!mp3_player_m.OpenPlayer(file_name))
-    {
+    if (play_mode >= PlayMode::PLAY_MODE_MAX) {
+        return Status::WRONG_PLAY_MODE;
+    }
+    if (!mp3_player_m.OpenPlayer(file_name)) {
         return Status::FILE_NOT_FOUND;
     }
     mp3_player_m.SetState(new PlayerPlayState(mp3_player_m, file_name, play_mode));

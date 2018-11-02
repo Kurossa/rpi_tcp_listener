@@ -3,7 +3,7 @@
 #include <pugixml/pugixml.hpp>
 
 TEST (PugiXmlTest, ParseExampleXmlConfig) {
-
+// TODO: Add proper xmpl parsing tests
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file("audio_app_cfg.xml");
     if (result.status != pugi::status_ok)

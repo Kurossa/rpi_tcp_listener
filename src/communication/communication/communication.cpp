@@ -12,7 +12,24 @@
 using namespace utils;
 using namespace comm;
 
-void Communication::handleCommand(char* cmdMsg, char* replyMsg) {
+namespace {
+ErrorCode Mp3PlayerStatusToError(const mp3player::Status& status) {
+    switch (status) {
+    case mp3player::Status::SUCCESS:
+        return ERROR_CODE_OK;
+    case mp3player::Status::FILE_NOT_FOUND:
+        return ERROR_CODE_NO_FILE_NUM;
+    case mp3player::Status::WRONG_PLAY_MODE:
+        return ERROR_CODE_PLAY_MODE_ERROR;
+    case mp3player::Status::FAILED:
+        return ERROR_CODE_WRONG_VOLUME;
+    default:
+        return ERROR_CODE_NOK;
+    }
+}
+}
+
+void Communication::handleCommand(const char* cmdMsg, char* replyMsg) {
     //printf("Received: %s", cmdMsg);
     msg_parser_m.ParseMsg(cmdMsg, strlen(cmdMsg));
     utils::GetTime(time_str_m);
@@ -62,6 +79,13 @@ void Communication::handleSetTime(char* replyMsg) {
 
 void Communication::handlePlay(char* replyMsg) {
     int file_num = atoi(msg_parser_m.GetMsgStrAt(1).c_str());
+
+    if (file_num < 1 && static_cast<size_t>(file_num) > config_manager_m.GetConfig().sound_files.size()) {
+        sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_NO_FILE_NUM);
+        return;
+    }
+    // Decrease file num to point index in vector not file number
+    --file_num;
     mp3player::PlayMode play_mode = mp3player::PlayMode::ONCE;
 
     if(0==strcmp(msg_parser_m.GetMsgStrAt(2).c_str(),"ONCE")){
@@ -72,13 +96,16 @@ void Communication::handlePlay(char* replyMsg) {
         play_mode = mp3player::PlayMode::PLAY_MODE_MAX;
     }
 
-    mp3_player_m.Play(config_manager_m.GetConfig().sound_files.at(file_num).c_str(), play_mode);
-    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_OK);
+    mp3player::Status status = mp3_player_m.Play(config_manager_m.GetConfig().sound_files.at(file_num).c_str(), play_mode);
+    ErrorCode error_code = Mp3PlayerStatusToError(status);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), error_code);
 }
 
 void Communication::handleStop(char* replyMsg) {
-    mp3_player_m.Stop();
-    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_OK);
+
+    mp3player::Status status = mp3_player_m.Stop();
+    ErrorCode error_code = Mp3PlayerStatusToError(status);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), error_code);
 }
 
 void Communication::handleSetCfg(char* replyMsg) {
@@ -102,8 +129,9 @@ void Communication::handleGetCfg(char* replyMsg) {
 void Communication::handleVolume(char* replyMsg) {
 
     int volume = atoi(msg_parser_m.GetMsgStrAt(1).c_str());
-    mp3_player_m.SetVolume(volume);
-    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_OK);
+    mp3player::Status status = mp3_player_m.SetVolume(volume);
+    ErrorCode error_code = Mp3PlayerStatusToError(status);
+    sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), error_code);
 }
 
 void Communication::handleReset(char* replyMsg) {

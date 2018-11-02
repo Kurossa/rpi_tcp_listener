@@ -29,7 +29,7 @@ public:
             command_m(0),
             reboot_callback_m(reboot_callback) {}
     ~Communication(void) {}
-    void handleCommand(char* cmdMsg,char* replyMsg);
+    void handleCommand(const char* cmdMsg,char* replyMsg);
 
 private:
     void handleSetTime(char* replyMsg);
