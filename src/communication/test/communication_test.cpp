@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#include <utilities/zip.h>
 #include <communication/communication.h>
 #include <cstring>
 #include <fstream>
@@ -7,6 +8,8 @@
 using namespace comm;
 
 namespace {
+
+const char compressed_file_name[] = "compressed_123.mp3";
 
 int LinesCount(std::string& s)
 {
@@ -33,7 +36,9 @@ class CommunicationFixture : public ::testing::Test
 public:
     CommunicationFixture()
         : logger_m(false, true)
-        , config_manager_m(logger_m) {}
+        , config_manager_m(logger_m) {
+        utils::ZipCompress("123.mp3", compressed_file_name);
+    }
     virtual void SetUp() {}
     virtual void TearDown() {}
 
@@ -152,14 +157,11 @@ TEST_F (CommunicationFixture, PlayOncePlayOncePlayWrongFileCommand) {
     // END\n
 
     config_manager_m.ParseConfigFile("audio_app_cfg.xml");
-    std::ifstream  src("123.mp3", std::ios::binary);
-    std::ofstream  dst("/tmp/123.mp3",   std::ios::binary);
-    dst << src.rdbuf();
-
     comm::Communication communication(config_manager_m, logger_m);
 
     char reply[1024] = {0};
     communication.handleCommand("TCP_PLAY\n1\nONCE\nEND\n", reply);
+
 
     std::string reply_str(reply);
     int lines_count = LinesCount(reply_str);
@@ -171,7 +173,6 @@ TEST_F (CommunicationFixture, PlayOncePlayOncePlayWrongFileCommand) {
 
     communication.handleCommand("TCP_PLAY\n1\nONCE\nEND\n", reply);
 
-    printf("%s", reply);
     reply_str = std::string(reply);
     lines_count = LinesCount(reply_str);
     EXPECT_EQ(5, lines_count);
@@ -180,10 +181,9 @@ TEST_F (CommunicationFixture, PlayOncePlayOncePlayWrongFileCommand) {
     EXPECT_STREQ("ERROR_CODE:0" ,ReadLine(reply_str, 4).c_str());
     EXPECT_STREQ("END" ,ReadLine(reply_str, 5).c_str());
 
-    rename("/tmp/123.mp3", "/tmp/234.mp3");
+    rename("/tmp/compressed_123.mp3", "/tmp/tmp.mp3");
     communication.handleCommand("TCP_PLAY\n1\nONCE\nEND\n", reply);
 
-    printf("%s", reply);
     reply_str = std::string(reply);
     lines_count = LinesCount(reply_str);
     EXPECT_EQ(5, lines_count);
@@ -191,7 +191,7 @@ TEST_F (CommunicationFixture, PlayOncePlayOncePlayWrongFileCommand) {
     EXPECT_STREQ("AUDIO_IDLE" ,ReadLine(reply_str, 3).c_str());
     EXPECT_STREQ("ERROR_CODE:3" ,ReadLine(reply_str, 4).c_str());
     EXPECT_STREQ("END" ,ReadLine(reply_str, 5).c_str());
-    rename("/tmp/234.mp3", "/tmp/123.mp3");
+    rename("/tmp/tmp.mp3", "/tmp/compressed_123.mp3");
 }
 
 TEST_F (CommunicationFixture, PlayInLoopCommand) {
@@ -202,10 +202,6 @@ TEST_F (CommunicationFixture, PlayInLoopCommand) {
     // END\n
 
     config_manager_m.ParseConfigFile("audio_app_cfg.xml");
-    std::ifstream  src("123.mp3", std::ios::binary);
-    std::ofstream  dst("/tmp/123.mp3",   std::ios::binary);
-    dst << src.rdbuf();
-
     comm::Communication communication(config_manager_m, logger_m);
 
     char reply[1024] = {0};
@@ -228,10 +224,6 @@ TEST_F (CommunicationFixture, PlayWrongModeCommand) {
     // END\n
 
     config_manager_m.ParseConfigFile("audio_app_cfg.xml");
-    std::ifstream  src("123.mp3", std::ios::binary);
-    std::ofstream  dst("/tmp/123.mp3",   std::ios::binary);
-    dst << src.rdbuf();
-
     comm::Communication communication(config_manager_m, logger_m);
 
     char reply[1024] = {0};
@@ -246,6 +238,47 @@ TEST_F (CommunicationFixture, PlayWrongModeCommand) {
     EXPECT_STREQ("END" ,ReadLine(reply_str, 5).c_str());
 }
 
+TEST_F (CommunicationFixture, StopPlayStopCommand) {
+    // Command:
+    // TCP_PLAY\n
+    // NR_PLIKU\n
+    // WRONG_MODE\n
+    // END\n
+
+    config_manager_m.ParseConfigFile("audio_app_cfg.xml");
+    comm::Communication communication(config_manager_m, logger_m);
+
+    char reply[1024] = {0};
+    communication.handleCommand("TCP_STOP\nEND\n", reply);
+
+    std::string reply_str(reply);
+    int lines_count = LinesCount(reply_str);
+    EXPECT_EQ(5, lines_count);
+    EXPECT_STREQ("COMMAND_2_RECEIVED" ,ReadLine(reply_str, 1).c_str());
+    EXPECT_STREQ("AUDIO_IDLE" ,ReadLine(reply_str, 3).c_str());
+    EXPECT_STREQ("ERROR_CODE:0" ,ReadLine(reply_str, 4).c_str());
+    EXPECT_STREQ("END" ,ReadLine(reply_str, 5).c_str());
+
+    communication.handleCommand("TCP_PLAY\n1\nONCE\nEND\n", reply);
+
+    reply_str = std::string(reply);
+    lines_count = LinesCount(reply_str);
+    EXPECT_EQ(5, lines_count);
+    EXPECT_STREQ("COMMAND_1_RECEIVED" ,ReadLine(reply_str, 1).c_str());
+    EXPECT_STREQ("AUDIO_PLAY_ONCE" ,ReadLine(reply_str, 3).c_str());
+    EXPECT_STREQ("ERROR_CODE:0" ,ReadLine(reply_str, 4).c_str());
+    EXPECT_STREQ("END" ,ReadLine(reply_str, 5).c_str());
+
+    communication.handleCommand("TCP_STOP\nEND\n", reply);
+
+    reply_str = std::string(reply);
+    lines_count = LinesCount(reply_str);
+    EXPECT_EQ(5, lines_count);
+    EXPECT_STREQ("COMMAND_2_RECEIVED" ,ReadLine(reply_str, 1).c_str());
+    EXPECT_STREQ("AUDIO_IDLE" ,ReadLine(reply_str, 3).c_str());
+    EXPECT_STREQ("ERROR_CODE:0" ,ReadLine(reply_str, 4).c_str());
+    EXPECT_STREQ("END" ,ReadLine(reply_str, 5).c_str());
+}
 
 
 

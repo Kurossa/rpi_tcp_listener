@@ -133,7 +133,10 @@ bool Mp3Player::OpenPlayer(std::string& file_name)
         return false;
     }
 
-    mpg123_getformat(mh_m, &rate, &channels, &encoding);
+    //TODO: remove this
+    //status = mpg123_param(mh_m, MPG123_RESYNC_LIMIT, -1, 0);
+    status = mpg123_getformat(mh_m, &rate, &channels, &encoding);
+//    MPG123_OK
 
     // Initialize ao_driver
     printf("ao_initialize (count: %d)\n",ao_count_m);

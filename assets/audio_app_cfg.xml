@@ -7,8 +7,8 @@
 		<port>9999</port>
 	</network>
 	<sounds>
-		<sound>123.mp3</sound>
-		<sound>123.mp3</sound>
+		<sound>compressed_123.mp3</sound>
+		<sound>compressed_123.mp3</sound>
 	</sounds>
 </audio_app_cfg>
 
