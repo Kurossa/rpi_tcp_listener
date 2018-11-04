@@ -39,6 +39,12 @@ public:
         , config_manager_m(logger_m) {
         utils::ZipCompress("123.mp3", compressed_file_name);
     }
+
+    ~CommunicationFixture() {
+        std::string file_to_remove = "rm /tmp/";
+        file_to_remove += compressed_file_name;
+        system(file_to_remove.c_str());
+    }
     virtual void SetUp() {}
     virtual void TearDown() {}
 
