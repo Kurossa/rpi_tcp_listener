@@ -18,7 +18,7 @@ ErrorCode Mp3PlayerStatusToError(const mp3player::Status& status) {
     case mp3player::Status::SUCCESS:
         return ERROR_CODE_OK;
     case mp3player::Status::FILE_NOT_FOUND:
-        return ERROR_CODE_NO_FILE_NUM;
+        return ERROR_CODE_NO_FILE;
     case mp3player::Status::WRONG_PLAY_MODE:
         return ERROR_CODE_PLAY_MODE_ERROR;
     case mp3player::Status::FAILED:
@@ -81,7 +81,7 @@ void Communication::handlePlay(char* replyMsg) {
     int file_num = atoi(msg_parser_m.GetMsgStrAt(1).c_str());
 
     if (file_num < 1 && static_cast<size_t>(file_num) > config_manager_m.GetConfig().sound_files.size()) {
-        sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_NO_FILE_NUM);
+        sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), mp3_player_m.GetStateStr().c_str(), ERROR_CODE_NO_FILE);
         return;
     }
     // Decrease file num to point index in vector not file number
@@ -111,9 +111,13 @@ void Communication::handleStop(char* replyMsg) {
 void Communication::handleSetCfg(char* replyMsg) {
     ErrorCode error_code = ERROR_CODE_OK;
     FILE* dest = fopen(config_file_g, "wb");
-    fwrite(msg_parser_m.GetMsgStrAt(2).c_str(), 1, strlen(msg_parser_m.GetMsgStrAt(2).c_str()), dest);
-    fclose(dest);
-    //printf("Config: %s \n",msgParser_m.getMsgNNodeStr(2));
+    if (dest) {
+        fwrite(msg_parser_m.GetMsgStrAt(2).c_str(), 1, strlen(msg_parser_m.GetMsgStrAt(2).c_str()), dest);
+        fclose(dest);
+    } else {
+        error_code = ERROR_CODE_NO_FILE;
+    }
+
     sprintf(replyMsg, "COMMAND_%d_RECEIVED\n%s\nERROR_CODE:%d\nEND\n", command_m, time_str_m.c_str(), error_code);
 }
 
