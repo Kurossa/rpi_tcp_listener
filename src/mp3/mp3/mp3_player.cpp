@@ -133,10 +133,7 @@ bool Mp3Player::OpenPlayer(std::string& file_name)
         return false;
     }
 
-    //TODO: remove this
-    //status = mpg123_param(mh_m, MPG123_RESYNC_LIMIT, -1, 0);
     status = mpg123_getformat(mh_m, &rate, &channels, &encoding);
-//    MPG123_OK
 
     // Initialize ao_driver
     printf("ao_initialize (count: %d)\n",ao_count_m);
@@ -248,8 +245,10 @@ void Mp3Player::DoPlay(std::string file_name, PlayMode play_mode)
         if(!stop_loop && file_played_n_times < file_play_max_times)
         {
             ClosePlayer();
-            //TODO: Add checking if same file did not corrupt meanwhile.
-            OpenPlayer(file_name);
+            // If reopned file is no longer exists stop player
+            if (!OpenPlayer(file_name)) {
+                stop_loop = true;
+            }
         }
     }
 

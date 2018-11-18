@@ -1,8 +1,9 @@
 #include "zip.h"
-#include <stdio.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
+#include <cstdio>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <fstream>
 
 using namespace utils;
 
@@ -11,7 +12,7 @@ ZipStatus utils::ZipUncompress(const char* source_name, const char* destination_
     char buf_normal[1024];
     char buf_reversed[1024];
     char buf_odd_char[2];
-    size_t size_read, size_read_total, size_total;
+    size_t size_read = 0, size_read_total = 0, size_total = 0;
     bool isOdd = false;
 
     if (source_name == destination_name || strcmp(source_name, destination_name) == 0)
@@ -27,16 +28,8 @@ ZipStatus utils::ZipUncompress(const char* source_name, const char* destination_
 
     FILE* dest = fopen(destination_name, "wb");
 
-    //TODO: add better way to determine file size without reading it
-    //#include <fstream>
-    //std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
-    //size_t size = in.tellg();
-
-    size_total = 0;
-    while ((size_read = fread(buf_normal, 1, FILE_BLOCK, source)))
-    {
-        size_total += size_read;
-    }
+    std::ifstream in(source_name, std::ifstream::ate | std::ifstream::binary);
+    size_total = in.tellg();
 
     fseek(source, 0, SEEK_SET);
     isOdd = (size_total % 2) ? true : false;
