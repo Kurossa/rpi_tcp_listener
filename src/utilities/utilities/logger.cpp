@@ -239,8 +239,8 @@ void Logger::Log(int iLevel, const char* pStrFormat, ...)
     }
 
     char acMsg[msg_len + 1];
-    char acDate[msg_len + 1];
-    char acBuf[msg_len + 1];
+    char acDate[128 + 1];
+    char acBuf[msg_len + 256 + 1];
 
     va_list list;
     va_start(list, pStrFormat);
