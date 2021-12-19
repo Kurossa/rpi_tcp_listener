@@ -9,14 +9,18 @@ TEST (PugiXmlTest, ParseExampleXmlConfig) {
     if (result.status != pugi::status_ok)
     {
         std::cout << "File does not exists" << std::endl;
+        FAIL() << "File does not exists";
         //return false;
     }
 
+    std::cout << "Sounds:" << std::endl;
     pugi::xml_node sounds = doc.child("audio_app_cfg").child("sounds");
     for (pugi::xml_node sound = sounds.child("sound"); sound; sound = sound.next_sibling("sound"))
     {
         std::cout << "sound: " << sound.child_value()<< std::endl;
     }
+    pugi::xml_node autoplay = sounds.child("autoplay");
+    std::cout << "Autoplays sound no: " << autoplay.child_value() << std::endl;
 
     std::cout << "Network:" << std::endl;
     pugi::xml_node net_ip = doc.child("audio_app_cfg").child("network").child("ip");

@@ -9,6 +9,7 @@
 	<sounds>
 		<sound>compressed_123.mp3</sound>
 		<sound>compressed_123.mp3</sound>
+		<autoplay>2</autoplay>
 	</sounds>
 </audio_app_cfg>
 

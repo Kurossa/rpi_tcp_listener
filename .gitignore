@@ -1,6 +1,2 @@
-build/
-build/BUILD.TXT
-build_local/
-src-build/
-src/CMakeLists.txt.user
-
+build*/
+src/CMakeLists.txt.user*

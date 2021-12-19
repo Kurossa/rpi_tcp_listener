@@ -126,6 +126,15 @@ int main(int argc, char** argv) {
         char replyMsg[tcp::BUFFER_SIZE];
         Communication communication(config_manager, logger, &RebootSystem);
 
+        // TODO: Move this code to more proper place
+        // autoplay file if set
+        if (config_manager.GetConfig().autoplay > 0 &&
+            static_cast<unsigned int>(config_manager.GetConfig().autoplay) <= config_manager.GetConfig().sound_files.size())
+        {
+            std::string autoplay_cmd("TCP_PLAY\n" + std::to_string(config_manager.GetConfig().autoplay) + "\nONCE\nEND\n");
+            communication.handleCommand(autoplay_cmd.c_str(), replyMsg);
+        }
+
         // server loop
         while (!stop_proccess_g) {
             int recvdBytes, sentBytes;

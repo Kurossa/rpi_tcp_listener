@@ -24,6 +24,7 @@ struct Configuration {
     int port;
     std::vector<std::string> compressed_files;
     std::vector<std::string> sound_files;
+    int autoplay;
 };
 
 

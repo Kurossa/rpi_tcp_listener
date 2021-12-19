@@ -22,7 +22,8 @@ ConfigManager::ConfigManager(utils::Logger& logger) : logger_m(logger)
         "",
         2055,
         std::vector<std::string>(),
-        std::vector<std::string>()};
+        std::vector<std::string>(),
+        0};
     configuration_m = default_configuration_m;
 }
 
@@ -56,6 +57,8 @@ config::Status ConfigManager::ParseXml(const char* file_name)
         }
         configuration_m.sound_files.push_back(file_in_ram);
     }
+    pugi::xml_node autoplay = sounds.child("autoplay");
+    std::istringstream(autoplay.child_value()) >> std::skipws >> configuration_m.autoplay;
 
     pugi::xml_node net_ip = doc.child("audio_app_cfg").child("network").child("ip");
     pugi::xml_node net_mask = doc.child("audio_app_cfg").child("network").child("mask");
